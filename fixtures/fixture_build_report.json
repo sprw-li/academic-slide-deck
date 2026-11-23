@@ -1,0 +1,105 @@
+{
+  "schema": "fixture_build/v1",
+  "cases": [
+    {
+      "case": "caseA",
+      "case_id": "SYNTHETIC-EXP-001",
+      "pdf_pages": 4,
+      "pdf_text_chars": 6139,
+      "pdf_embedded_images": 16,
+      "pdf_fonts": [
+        "BAAAAA+LiberationSerif",
+        "CAAAAA+LiberationSerif",
+        "DAAAAA+LiberationSerif",
+        "EAAAAA+LiberationSerif",
+        "FAAAAA+LiberationSerif"
+      ],
+      "figures": 4,
+      "tables": 2,
+      "distinct_numbers": 80,
+      "text_chars": 5803,
+      "files": {
+        "caseA/materials/paper.docx": {
+          "sha256": "4c07b0d2428b4f7f99bf9e3694565a56f77cd162c3998a85f91c461afa02cd71",
+          "bytes": 185094
+        },
+        "caseA/materials/paper.pdf": {
+          "sha256": "3cf6a41402c19f9cf1343ac09fb9f3f56265e0137af3aed1929ce7bf778e62ac",
+          "bytes": 189626
+        },
+        "caseA/case.json": {
+          "sha256": "bcebd86020aa6c1c9effa52751d762bbb2a87798b2ce0e2a3dfa0893b67bd6b2",
+          "bytes": 1553
+        },
+        "caseA/task.md": {
+          "sha256": "152630b5f406acdd16bdd2b990c0fca63166ddf83475e4c46b680dd0c8d5df72",
+          "bytes": 1548
+        },
+        "caseA/materials/figures/figure1-morphology.png": {
+          "sha256": "3ecadd5420d18bbd162fd996e081aa33531dd0d5bd97b001e49634c88d5051bf",
+          "bytes": 30568
+        },
+        "caseA/materials/figures/figure2-degradation.png": {
+          "sha256": "c72f2758894b54981c9fb007659afc8a56cd86901c89b41b9fecfbe3537f9023",
+          "bytes": 56074
+        },
+        "caseA/materials/figures/figure3-kinetics.png": {
+          "sha256": "5c2f36eef2cd50de660f923087c04195cbb93c49cf767bebd1f051fa2641c6b9",
+          "bytes": 46337
+        },
+        "caseA/materials/figures/figure4-cycles.png": {
+          "sha256": "14a82648f547e1523572e07509171b6afe391f9e4b0f4400f379992f3e1864fd",
+          "bytes": 27693
+        }
+      }
+    },
+    {
+      "case": "caseB",
+      "case_id": "SYNTHETIC-REV-002",
+      "pdf_pages": 4,
+      "pdf_text_chars": 5820,
+      "pdf_embedded_images": 12,
+      "pdf_fonts": [
+        "BAAAAA+LiberationSerif",
+        "CAAAAA+LiberationSerif",
+        "DAAAAA+LiberationSerif",
+        "EAAAAA+LiberationSerif",
+        "FAAAAA+LiberationSerif"
+      ],
+      "figures": 3,
+      "tables": 2,
+      "distinct_numbers": 44,
+      "text_chars": 5447,
+      "files": {
+        "caseB/materials/paper.docx": {
+          "sha256": "a595d83110e38e5ebbd039108012de0c09c1996c70f64bcbdd96b0a2e144c29b",
+          "bytes": 138006
+        },
+        "caseB/materials/paper.pdf": {
+          "sha256": "2f6571ff03e07048bf46ef71a9e37035b33cb70629e2cb0f1dd56b666bd4e4b9",
+          "bytes": 165143
+        },
+        "caseB/case.json": {
+          "sha256": "a0b9021d6e5d88dd442c4d2f3399a436050543c8f616e99feec1b704998e5d87",
+          "bytes": 1455
+        },
+        "caseB/task.md": {
+          "sha256": "fb6c1fccf7b319b39169c12abb2371b4a5bf62b4048104549c04891fe6252cc0",
+          "bytes": 1381
+        },
+        "caseB/materials/figures/figure1-selection.png": {
+          "sha256": "969da06e973e64c9370508a872e3998a9b0f2a9ebc8b9479e621d556c4498e54",
+          "bytes": 25658
+        },
+        "caseB/materials/figures/figure2-mae.png": {
+          "sha256": "a122671c35695acef961d6181bb9e8b8b29011a1ee73aa8062606d1f6e648fc1",
+          "bytes": 35525
+        },
+        "caseB/materials/figures/figure3-parity.png": {
+          "sha256": "473607360635cfa38c7c90f191b8cf233420bfbda837fa1680368a3b31d0c13f",
+          "bytes": 48715
+        }
+      }
+    }
+  ]
+}

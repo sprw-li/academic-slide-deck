@@ -1,0 +1,11 @@
+# Cases that scripts/selftest.py asserts are FULLY GREEN end-to-end (verify verdict PASS,
+# zero FAIL, zero UNVERIFIED) after a real run.py.
+#
+# To keep the harness honest while a case is being fixed by its owner, remove that case
+# from this file: selftest.py then still runs it and reports its specific red check ids as
+# "exercised", but a red check there no longer fails the harness. A defect injection is
+# only ever counted as DETECTED when its gate id was PASS in the un-injected run.
+#
+# Both synthetic fixtures are green as of the last full run (18/18 checks, render ok).
+caseA
+caseB

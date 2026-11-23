@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "render_report/v1",
+  "title": "render_report.json (render_report/v1)",
+  "description": "What render.py actually produced. Rendering degrades honestly: with no renderer, status is \"skipped\" and renderer.available is false — a preview is never claimed unless it exists.",
+  "type": "object",
+  "required": ["schema", "renderer", "pdf", "pngs", "status"],
+  "properties": {
+    "schema": {"const": "render_report/v1"},
+    "case_id": {"type": "string"},
+    "renderer": {
+      "type": "object",
+      "required": ["name", "available"],
+      "properties": {
+        "name": {"enum": ["libreoffice-kit", "soffice", "none"]},
+        "version": {"type": "string"},
+        "command": {"type": "string"},
+        "available": {"type": "boolean"}
+      }
+    },
+    "pdf": {
+      "type": "object",
+      "properties": {
+        "path": {"type": "string"}, "pages": {"type": "integer"},
+        "bytes": {"type": "integer"}, "sha256": {"type": "string"}
+      }
+    },
+    "pngs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slide", "path"],
+        "properties": {
+          "slide": {"type": "integer"}, "path": {"type": "string"},
+          "bytes": {"type": "integer"}, "width": {"type": "integer"},
+          "height": {"type": "integer"}
+        }
+      }
+    },
+    "status": {"enum": ["ok", "skipped", "failed"]},
+    "error": {"type": ["string", "null"]},
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "schema": "gain_check/v1",
+  "case": "caseA",
+  "case_json": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\caseA\\case.json",
+  "disclaimer": "Measured on our own synthetic fixture (SYNTHETIC / NOT AN OFFICIAL CASE). This is not an official score: the platform scores on its own hidden cases against its own whiteboard. The comparison column is a deterministic proxy, NOT a measured base-Agent (no-Skill) run.",
+  "official_score": null,
+  "measured_on": "own synthetic fixture",
+  "with_skill": {
+    "pages_needing_reorder": {
+      "value": 0,
+      "slides": 8,
+      "slides_with_locator_page": 8,
+      "slides_without_locator_page": 0,
+      "source_page_sequence": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "longest_increasing_subsequence": 8,
+      "definition": "len(slides with locator) - LIS(page sequence); the LIS is the already-correct part, so the remainder must be moved"
+    },
+    "export_recheck_rounds": {
+      "value": 1,
+      "verify_reports_present": 2,
+      "verification_stage_events_in_log": 0,
+      "baseline_value": null,
+      "definition": "recorded verification passes for this run (log stage events); a no-Skill baseline cannot be measured from our artifacts, so the baseline is null rather than guessed"
+    },
+    "numbers_failing_traceability": {
+      "value": 0,
+      "numeric_tokens_on_slides": 30,
+      "attested_numbers_in_material": 81,
+      "offenders": [],
+      "definition": "numeric tokens with no verbatim match in material.numbers (recomputed independently of verify_deck.py; numbers in figure captions may legitimately be labels)"
+    },
+    "template_violations": {
+      "value": 0,
+      "violating_gate_ids": [],
+      "statuses": {
+        "V07": "PASS",
+        "V08": "PASS",
+        "V09": "PASS"
+      },
+      "definition": "non-PASS results among V07 (masters/layouts), V08 (theme fonts), V09 (footer/slide-number placeholders)"
+    },
+    "extras": {
+      "slides_total": 8,
+      "slides_over_bullet_cap": 0,
+      "slides_below_notes_min": 0,
+      "slides_without_evidence": 0,
+      "figures_in_material": 4,
+      "tables_in_material": 2,
+      "claims_in_material": 39,
+      "material_warnings": 9
+    },
+    "verify_verdict": "PASS",
+    "verify_counts": {
+      "PASS": 19,
+      "FAIL": 0,
+      "SKIP": 0,
+      "UNVERIFIED": 0
+    },
+    "_slides_over_constraint": 0,
+    "manual_fix_count": 0
+  },
+  "baseline": {
+    "baseline_kind": "deterministic-naive-plan-through-the-real-builder",
+    "construction": "naive (paste-first-sentences)",
+    "section_order": {
+      "pages_needing_reorder": {
+        "value": null,
+        "slides": 7,
+        "slides_with_locator_page": 0,
+        "note": "no slide carried a source-page locator; metric not computable"
+      },
+      "export_recheck_rounds": {
+        "value": 1,
+        "verify_reports_present": 2,
+        "verification_stage_events_in_log": 0,
+        "baseline_value": null,
+        "definition": "recorded verification passes for this run (log stage events); a no-Skill baseline cannot be measured from our artifacts, so the baseline is null rather than guessed"
+      },
+      "numbers_failing_traceability": {
+        "value": 0,
+        "numeric_tokens_on_slides": 53,
+        "attested_numbers_in_material": 81,
+        "offenders": [],
+        "definition": "numeric tokens with no verbatim match in material.numbers (recomputed independently of verify_deck.py; numbers in figure captions may legitimately be labels)"
+      },
+      "template_violations": {
+        "value": 0,
+        "violating_gate_ids": [],
+        "statuses": {
+          "V07": "PASS",
+          "V08": "PASS",
+          "V09": "PASS"
+        },
+        "definition": "non-PASS results among V07 (masters/layouts), V08 (theme fonts), V09 (footer/slide-number placeholders)"
+      },
+      "extras": {
+        "slides_total": 7,
+        "slides_over_bullet_cap": 0,
+        "slides_below_notes_min": 7,
+        "slides_without_evidence": 7,
+        "figures_in_material": 4,
+        "tables_in_material": 2,
+        "claims_in_material": 39,
+        "material_warnings": 9
+      },
+      "verify_verdict": "FAIL",
+      "verify_counts": {
+        "PASS": 11,
+        "FAIL": 5,
+        "SKIP": 0,
+        "UNVERIFIED": 3
+      },
+      "_slides_over_constraint": 0
+    },
+    "paragraph_dump": {
+      "construction": "one slide per source claim/paragraph, copied verbatim (the documented naive failure mode)",
+      "slides": 39,
+      "pages_needing_reorder": 0,
+      "slides_over_case_constraint": 31,
+      "slides_with_notes": 0,
+      "slides_with_evidence": 39,
+      "numbers_failing_traceability": 0,
+      "template_violations": null,
+      "export_recheck_rounds": null
+    },
+    "page_basis_source": "src2",
+    "case_slide_constraint": 8,
+    "caveat": "The naive arm is NOT a base-Agent (no-Skill) model run: this host has no second agent harness and no platform whiteboard. It is a documented deterministic construction (one slide per source section, first sentences pasted verbatim into the placeholders, no speaker notes, no evidence locators, slide count not curated) pushed through the SAME scripts/build_deck.py and the SAME scripts/verify_deck.py as the real arm, so both columns are measured by one metric implementation. Quote it as 'our naive construction', never as the base Agent's measured result and never as an official score."
+  },
+  "cross_checks": {
+    "V04_status": "PASS",
+    "our_untraceable_count": 0
+  },
+  "problems": [],
+  "status": "PASS",
+  "baseline_arms": {
+    "naive_paste_arm": {
+      "arm": "naive (paste-first-sentences)",
+      "arm_kind": "deterministic-naive-plan-through-the-real-builder",
+      "template": "template-organizer.pptx",
+      "steps": [
+        {
+          "stage": "build_deck.py",
+          "exit": 0,
+          "stderr_tail": "[INFO] stage_start \n[INFO] stage_end"
+        },
+        {
+          "stage": "verify_deck.py",
+          "exit": 1,
+          "stderr_tail": ""
+        }
+      ],
+      "metrics": {
+        "pages_needing_reorder": {
+          "value": null,
+          "slides": 7,
+          "slides_with_locator_page": 0,
+          "note": "no slide carried a source-page locator; metric not computable"
+        },
+        "export_recheck_rounds": {
+          "value": 1,
+          "verify_reports_present": 2,
+          "verification_stage_events_in_log": 0,
+          "baseline_value": null,
+          "definition": "recorded verification passes for this run (log stage events); a no-Skill baseline cannot be measured from our artifacts, so the baseline is null rather than guessed"
+        },
+        "numbers_failing_traceability": {
+          "value": 0,
+          "numeric_tokens_on_slides": 53,
+          "attested_numbers_in_material": 81,
+          "offenders": [],
+          "definition": "numeric tokens with no verbatim match in material.numbers (recomputed independently of verify_deck.py; numbers in figure captions may legitimately be labels)"
+        },
+        "template_violations": {
+          "value": 0,
+          "violating_gate_ids": [],
+          "statuses": {
+            "V07": "PASS",
+            "V08": "PASS",
+            "V09": "PASS"
+          },
+          "definition": "non-PASS results among V07 (masters/layouts), V08 (theme fonts), V09 (footer/slide-number placeholders)"
+        },
+        "extras": {
+          "slides_total": 7,
+          "slides_over_bullet_cap": 0,
+          "slides_below_notes_min": 7,
+          "slides_without_evidence": 7,
+          "figures_in_material": 4,
+          "tables_in_material": 2,
+          "claims_in_material": 39,
+          "material_warnings": 9
+        },
+        "verify_verdict": "FAIL",
+        "verify_counts": {
+          "PASS": 11,
+          "FAIL": 5,
+          "SKIP": 0,
+          "UNVERIFIED": 3
+        },
+        "_slides_over_constraint": 0
+      },
+      "manual_fix_count": 7,
+      "verify_failing_ids": [
+        "V01",
+        "V03",
+        "V12",
+        "V13",
+        "V14",
+        "V15",
+        "V16",
+        "V19"
+      ],
+      "status": "MEASURED"
+    },
+    "deterministic_proxies": {
+      "baseline_kind": "deterministic-proxy-not-a-model-run",
+      "page_basis_source": "src2",
+      "page_basis_note": "both columns use the page numbers of the same source (src2), so the re-order metric is comparable",
+      "case_slide_constraint": 8,
+      "section_order": {
+        "construction": "one slide per source section, source order, text verbatim",
+        "slides": 7,
+        "pages_needing_reorder": 0,
+        "slides_over_case_constraint": 0,
+        "slides_with_notes": 0,
+        "slides_with_evidence": 7,
+        "numbers_failing_traceability": 0,
+        "template_violations": null,
+        "export_recheck_rounds": null
+      },
+      "paragraph_dump": {
+        "construction": "one slide per source claim/paragraph, copied verbatim (the documented naive failure mode)",
+        "slides": 39,
+        "pages_needing_reorder": 0,
+        "slides_over_case_constraint": 31,
+        "slides_with_notes": 0,
+        "slides_with_evidence": 39,
+        "numbers_failing_traceability": 0,
+        "template_violations": null,
+        "export_recheck_rounds": null
+      },
+      "caveat": "a real no-Skill baseline run is NOT available on this host (no second agent harness, no platform whiteboard); these columns are deterministic proxies and must not be quoted as the base Agent's measured result"
+    },
+    "baseline_note": "The naive arm is NOT a base-Agent (no-Skill) model run: this host has no second agent harness and no platform whiteboard. It is a documented deterministic construction (one slide per source section, first sentences pasted verbatim into the placeholders, no speaker notes, no evidence locators, slide count not curated) pushed through the SAME scripts/build_deck.py and the SAME scripts/verify_deck.py as the real arm, so both columns are measured by one metric implementation. Quote it as 'our naive construction', never as the base Agent's measured result and never as an official score."
+  },
+  "comparison": [
+    {
+      "metric": "pages_needing_reorder",
+      "with_skill": 0,
+      "naive_arm": null,
+      "proxy_section": {
+        "value": null,
+        "slides": 7,
+        "slides_with_locator_page": 0,
+        "note": "no slide carried a source-page locator; metric not computable"
+      },
+      "discriminating": false
+    },
+    {
+      "metric": "numbers_failing_traceability",
+      "with_skill": 0,
+      "naive_arm": 0,
+      "proxy_section": {
+        "value": 0,
+        "numeric_tokens_on_slides": 53,
+        "attested_numbers_in_material": 81,
+        "offenders": [],
+        "definition": "numeric tokens with no verbatim match in material.numbers (recomputed independently of verify_deck.py; numbers in figure captions may legitimately be labels)"
+      },
+      "discriminating": false
+    },
+    {
+      "metric": "template_violations",
+      "with_skill": 0,
+      "naive_arm": 0,
+      "proxy_section": null,
+      "note": "the deterministic proxy is never built through the template, so only the naive arm and the real arm have a template column",
+      "discriminating": false
+    },
+    {
+      "metric": "slides_over_case_constraint",
+      "with_skill": 0,
+      "naive_arm": 0,
+      "proxy_section": null,
+      "discriminating": false
+    },
+    {
+      "metric": "slides_below_notes_min",
+      "with_skill": 0,
+      "naive_arm": 7,
+      "proxy_section": 7,
+      "discriminating": true
+    },
+    {
+      "metric": "manual_fix_count (composite)",
+      "with_skill": 0,
+      "naive_arm": 7,
+      "proxy_section": null,
+      "note": "our own composite: over-cap slides + under-notes slides + over-constraint slides + reordered pages + untraceable numbers + template violations",
+      "discriminating": true
+    },
+    {
+      "metric": "gate_failures (FAIL+UNVERIFIED checks)",
+      "with_skill": 0,
+      "naive_arm": 8,
+      "proxy_section": null,
+      "note": "the clearest discriminator: how many of the Skill's own gates the arm's deck fails. Naive failing ids: V01,V03,V12,V13,V14,V15,V16,V19",
+      "discriminating": true
+    }
+  ],
+  "naive_arm_status": "MEASURED",
+  "limitations": [
+    "The naive arm is NOT a base-Agent (no-Skill) model run: this host has no second agent harness and no platform whiteboard. It is a documented deterministic construction (one slide per source section, first sentences pasted verbatim into the placeholders, no speaker notes, no evidence locators, slide count not curated) pushed through the SAME scripts/build_deck.py and the SAME scripts/verify_deck.py as the real arm, so both columns are measured by one metric implementation. Quote it as 'our naive construction', never as the base Agent's measured result and never as an official score.",
+    "Noise floor: one run on one synthetic fixture. A difference of one or two units is not evidence of a real improvement.",
+    "metric 'pages_needing_reorder' does not discriminate on this fixture (with Skill 0 vs {'naive_arm': None, 'proxy_section': {'value': None, 'slides': 7, 'slides_with_locator_page': 0, 'note': 'no slide carried a source-page locator; metric not computable'}}); it is reported for completeness, not as evidence",
+    "metric 'numbers_failing_traceability' does not discriminate on this fixture (with Skill 0 vs {'naive_arm': 0, 'proxy_section': {'value': 0, 'numeric_tokens_on_slides': 53, 'attested_numbers_in_material': 81, 'offenders': [], 'definition': 'numeric tokens with no verbatim match in material.numbers (recomputed independently of verify_deck.py; numbers in figure captions may legitimately be labels)'}}); it is reported for completeness, not as evidence",
+    "metric 'template_violations' does not discriminate on this fixture (with Skill 0 vs {'naive_arm': 0, 'proxy_section': None}); it is reported for completeness, not as evidence",
+    "metric 'slides_over_case_constraint' does not discriminate on this fixture (with Skill 0 vs {'naive_arm': 0, 'proxy_section': None}); it is reported for completeness, not as evidence"
+  ],
+  "official_score_claim": null
+}

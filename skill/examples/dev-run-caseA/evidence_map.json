@@ -1,0 +1,895 @@
+{
+  "schema": "evidence_map/v1",
+  "case_id": "SYNTHETIC-EXP-001",
+  "pages": [
+    {
+      "slide": 1,
+      "role": "title",
+      "claims": [
+        {
+          "claim": "Nitrogen-doped titanium dioxide (N-TiO2) powders were prepared by a urea-assisted sol-gel route and calcined at 500 °C for 4 h.",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study Synthetic Author Group — FIXTURE TEXT, NOT A REAL PUBLICATION SYNTHETIC / NOT AN OFFICIAL CASE — every number in this file is invented.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "claim",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study Synthetic Author Group — FIXTURE TEXT, NOT A REAL PUBLICATION SYNTHETIC / NOT AN OFFICIAL CASE — every number in this file is invented.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "2",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "500",
+          "locator": {
+            "page": 1,
+            "quote": "This work reports a single N-TiO2 series prepared at one calcination temperature (500 °C) and compares it with a commercial P25 reference under identical illumination conditions.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "4",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 2,
+      "role": "problem",
+      "claims": [
+        {
+          "claim": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+          "locator": {
+            "page": 1,
+            "quote": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl5",
+          "locator": {
+            "page": 1,
+            "quote": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl6",
+          "locator": {
+            "page": 1,
+            "quote": "Five consecutive reuse cycles retained 88.1 % of the initial activity.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl7",
+          "locator": {
+            "page": 1,
+            "quote": "Every value in this paragraph is invented for the fixture.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "0.0312",
+          "locator": {
+            "page": 1,
+            "quote": "The corresponding pseudo-first-order rate constant was 0.0312 min-1 for N-TiO2-2.0 and 0.0061 min-1 for P25, a five-fold difference.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "1",
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0.994",
+          "locator": {
+            "page": 1,
+            "quote": "The fit quality was R2 = 0.994 over seven points.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "88.1",
+          "locator": {
+            "page": 1,
+            "quote": "Removal decayed from 92.4 % in cycle 1 to 81.4 % in cycle 5, so the material retained 88.1 % of its initial activity.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "4",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 3,
+      "role": "method",
+      "claims": [
+        {
+          "claim": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl14",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl15",
+          "locator": {
+            "page": 1,
+            "quote": "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl17",
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30, 40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "80",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "12",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "500",
+          "locator": {
+            "page": 1,
+            "quote": "This work reports a single N-TiO2 series prepared at one calcination temperature (500 °C) and compares it with a commercial P25 reference under identical illumination conditions.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "4",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "5",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "20",
+          "locator": {
+            "page": 1,
+            "quote": "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3",
+          "locator": {
+            "page": 1,
+            "quote": "3.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0",
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "10",
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "30",
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "40",
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "50",
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "60",
+          "locator": {
+            "page": 1,
+            "quote": "Under visible light the best sample removed 92.4 % of MB in 60 min, whereas the P25 reference removed 30.7 % over the same period.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "9000",
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 4,
+      "role": "result",
+      "claims": [
+        {
+          "claim": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+          "locator": {
+            "page": 1,
+            "quote": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl19",
+          "locator": {
+            "page": 1,
+            "quote": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl20",
+          "locator": {
+            "page": 1,
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl24",
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "0.5",
+          "locator": {
+            "page": 1,
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3.4",
+          "locator": {
+            "page": 1,
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0.21",
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3",
+          "locator": {
+            "page": 1,
+            "quote": "3.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "9.4",
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 5,
+      "role": "figure",
+      "claims": [
+        {
+          "claim": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+          "locator": {
+            "page": 1,
+            "quote": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h). This panel is a drawing, not a micrograph.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [
+        {
+          "ref": "fig1",
+          "label": "Figure 1",
+          "caption": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h). This panel is a drawing, not a micrograph.",
+          "locator": {
+            "page": 1,
+            "quote": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h). This panel is a drawing, not a micrograph.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "2",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "500",
+          "locator": {
+            "page": 1,
+            "quote": "This work reports a single N-TiO2 series prepared at one calcination temperature (500 °C) and compares it with a commercial P25 reference under identical illumination conditions.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "4",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "1",
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 6,
+      "role": "table",
+      "claims": [
+        {
+          "claim": "Table 1. Composition and textural properties of the synthetic series.",
+          "locator": {
+            "page": 1,
+            "quote": "Table 1. Composition and textural properties of the synthetic series.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [
+        {
+          "ref": "tab1",
+          "label": "Table 1",
+          "caption": "Table 1. Composition and textural properties of the synthetic series.",
+          "locator": {
+            "page": 1,
+            "quote": "Table 1. Composition and textural properties of the synthetic series.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "numbers": [
+        {
+          "raw": "1",
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3",
+          "locator": {
+            "page": 1,
+            "quote": "3.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "4",
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0.0",
+          "locator": {
+            "page": 1,
+            "quote": "Undoped TiO2 | 0.0 | 41.2 | 18.9 | 3.18",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "41.2",
+          "locator": {
+            "page": 1,
+            "quote": "Surface area increased from 41.2 m2/g (undoped) to 78.6 m2/g (N-TiO2), and the mean crystallite size from Rietveld refinement fell from 18.9 nm to 12.3 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "18.9",
+          "locator": {
+            "page": 1,
+            "quote": "Surface area increased from 41.2 m2/g (undoped) to 78.6 m2/g (N-TiO2), and the mean crystallite size from Rietveld refinement fell from 18.9 nm to 12.3 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3.18",
+          "locator": {
+            "page": 1,
+            "quote": "Diffuse-reflectance spectra gave a Tauc band gap of 2.84 eV for N-TiO2 versus 3.18 eV for the undoped control, a shift of 0.34 eV.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0.5",
+          "locator": {
+            "page": 1,
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "0.9",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-0.5 | 0.9 | 63.4 | 14.6 | 3.02",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "63.4",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-0.5 | 0.9 | 63.4 | 14.6 | 3.02",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "14.6",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-0.5 | 0.9 | 63.4 | 14.6 | 3.02",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3.02",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-0.5 | 0.9 | 63.4 | 14.6 | 3.02",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "1.0",
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "1.8",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-1.0 | 1.8 | 71.9 | 13.1 | 2.91",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "71.9",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-1.0 | 1.8 | 71.9 | 13.1 | 2.91",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "13.1",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-1.0 | 1.8 | 71.9 | 13.1 | 2.91",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2.91",
+          "locator": {
+            "page": 1,
+            "quote": "N-TiO2-1.0 | 1.8 | 71.9 | 13.1 | 2.91",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2.0",
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "3.4",
+          "locator": {
+            "page": 1,
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "78.6",
+          "locator": {
+            "page": 1,
+            "quote": "Surface area increased from 41.2 m2/g (undoped) to 78.6 m2/g (N-TiO2), and the mean crystallite size from Rietveld refinement fell from 18.9 nm to 12.3 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "12.3",
+          "locator": {
+            "page": 1,
+            "quote": "Surface area increased from 41.2 m2/g (undoped) to 78.6 m2/g (N-TiO2), and the mean crystallite size from Rietveld refinement fell from 18.9 nm to 12.3 nm.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "raw": "2.84",
+          "locator": {
+            "page": 1,
+            "quote": "Diffuse-reflectance spectra gave a Tauc band gap of 2.84 eV for N-TiO2 versus 3.18 eV for the undoped control, a shift of 0.34 eV.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    },
+    {
+      "slide": 7,
+      "role": "limitation",
+      "claims": [
+        {
+          "claim": "The study uses a single dye, a single catalyst dose and one calcination temperature.",
+          "locator": {
+            "page": 1,
+            "quote": "The study uses a single dye, a single catalyst dose and one calcination temperature.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "cl35",
+          "locator": {
+            "page": 1,
+            "quote": "The study uses a single dye, a single catalyst dose and one calcination temperature.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [],
+      "unverified": []
+    },
+    {
+      "slide": 8,
+      "role": "conclusion",
+      "claims": [
+        {
+          "claim": "Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+          "locator": {
+            "page": 1,
+            "quote": "Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
+          "claim": "claim",
+          "locator": {
+            "page": 1,
+            "quote": "Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "figures": [],
+      "tables": [],
+      "numbers": [
+        {
+          "raw": "0.5",
+          "locator": {
+            "page": 1,
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        }
+      ],
+      "unverified": []
+    }
+  ],
+  "coverage": {
+    "slides_total": 8,
+    "slides_with_evidence": 8,
+    "slides_with_verified_evidence": 8
+  },
+  "warnings": []
+}

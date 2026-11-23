@@ -1,0 +1,72 @@
+{
+  "_excerpt": "key fields of the real render_report.json (per-PNG hashes/paths trimmed)",
+  "schema": "render_report/v1",
+  "renderer": {
+    "name": "libreoffice-kit",
+    "version": "native",
+    "available": true,
+    "strategy": "bounded-search",
+    "command": "<abs-path-not-shipped> <abs-path-not-shipped> Harness\\resources\\app.asar.unpacked\\dsh\\node_modules\\@deepseek-ai\\libreoffice-kit\\lib\\cli.js"
+  },
+  "status": "ok",
+  "error": null,
+  "uncertainty": [
+    "The renderer could not find these font families: Liberation Serif -- glyphs are therefore substituted, so the previews are a substitute render and must not be read as a certificate of font fidelity. Measured: the exported PDF embeds /BAAAAA+TimesNewRomanPSMT, /CAAAAA+TimesNewRomanPSMT, /DAAAAA+TimesNewRomanPSMT, /EAAAAA+TimesNewRomanPSMT, /FAAAAA+ArialMT, /GAAAAA+TimesNewRomanPSMT, /HAAAAA+TimesNewRomanPS-BoldMT, /IAAAAA+TimesNewRomanPSMT, /JAAAAA+TimesNewRomanPSMT, /KAAAAA+TimesNewRomanPSMT instead."
+  ],
+  "pdf": {
+    "pages": 8,
+    "bytes": 254669,
+    "sha256": "f62039d4f5e3504a0325d44e14b4a7017cb9e7999b4846a107dd430a905b6503",
+    "path": "output/render/deck.pdf"
+  },
+  "pngs": [
+    {
+      "slide": 1,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 76382
+    },
+    {
+      "slide": 2,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 98174
+    },
+    {
+      "slide": 3,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 121199
+    },
+    {
+      "slide": 4,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 99019
+    },
+    {
+      "slide": 5,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 75489
+    },
+    {
+      "slide": 6,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 108497
+    },
+    {
+      "slide": 7,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 45635
+    },
+    {
+      "slide": 8,
+      "width": 1441,
+      "height": 1081,
+      "bytes": 56505
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "result/v1",
+  "title": "result.json (result/v1)",
+  "description": "The case's return value. Its declared shape is NOT fixed: /input/case.json carries its own output_contract, so every key it declares must appear here (that obligation is checked by V13) while the key NAMES are open — hidden cases name their outputs anything. additionalProperties is therefore true and no fixture key name is required. Always present: case_id, status, sources, uncertainty, change_records, _self_check. A declared key that cannot be delivered appears with a null/[] value plus an uncertainty entry and a record in _unmapped_contract_keys — a declared key is never dropped silently. status is 'ok' only when the run completed and the gate passed; 'partial' names its limits.",
+  "type": "object",
+  "required": ["case_id", "status"],
+  "additionalProperties": true,
+  "properties": {
+    "case_id": {"type": "string"},
+    "status": {"enum": ["ok", "partial", "failed", "needs_human"]},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string"}, "sha256": {"type": "string"},
+          "role": {"type": "string"}
+        }
+      }
+    },
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "change_records": {"type": "array", "items": {"type": "object"}},
+    "_self_check": {
+      "type": "object",
+      "properties": {
+        "verify_verdict": {"enum": ["PASS", "FAIL", "SKIP", "UNVERIFIED", null]},
+        "checks_failed": {"type": "array", "items": {"type": "string"}},
+        "artifacts": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "_unmapped_contract_keys": {
+      "type": "array",
+      "description": "output_contract keys that matched no exact name or synonym",
+      "items": {"type": "string"}
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

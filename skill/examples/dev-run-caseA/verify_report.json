@@ -1,0 +1,194 @@
+{
+  "schema": "verify_report/v1",
+  "case_id": "SYNTHETIC-EXP-001",
+  "checks": [
+    {
+      "id": "V01",
+      "name": "slide count within the case constraint",
+      "status": "PASS",
+      "detail": "deck has 8 slides; constraint {'slide_count': 8, 'duration_min': 10} satisfied (counted from the deck file itself)",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V02",
+      "name": "every slide has non-empty title and claim",
+      "status": "PASS",
+      "detail": "all 8 slides carry a non-empty deck title and a non-empty plan claim",
+      "evidence": "work/\\plan.json:231"
+    },
+    {
+      "id": "V03",
+      "name": "every slide has notes >= 40 chars",
+      "status": "PASS",
+      "detail": "all 8 slides carry >= 40 chars of notes, measured from the deck's notes slides",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V04",
+      "name": "every number on a slide is traceable to material.numbers",
+      "status": "PASS",
+      "detail": "every numeric token on the slides matches one of the 111 attested representations in material.numbers (caption labels stripped; source = deck text, not plan.json)",
+      "evidence": "work/\\material.json:435"
+    },
+    {
+      "id": "V05",
+      "name": "every figure/table reference resolves in material.json",
+      "status": "PASS",
+      "detail": "all figure/table references resolve against 4 figures and 2 tables in material.json",
+      "evidence": "work/\\material.json:356"
+    },
+    {
+      "id": "V06",
+      "name": "every embedded image is source-crop or redraw-from-data",
+      "status": "PASS",
+      "detail": "2 embedded image(s) counted in the deck; every one has a declared provenance mode in ['redraw-from-data', 'source-crop']. Placeholder/invented graphics are excluded by construction; note this proves provenance *mode*, not that the pixels equal the paper's figure.",
+      "evidence": "work/\\build_report.json:45"
+    },
+    {
+      "id": "V07",
+      "name": "template masters/layouts not modified",
+      "status": "PASS",
+      "detail": "12 master/layout part(s) byte-normalised-identical (C14N) between template-organizer.pptx and the deck's own OOXML; this is an independent XML comparison, not the builder's invariants flag",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V08",
+      "name": "theme fonts unchanged from template",
+      "status": "PASS",
+      "detail": "major/minor latin+ea typefaces identical to the template: {'major_latin': 'Liberation Serif', 'minor_latin': 'Liberation Serif', 'major_ea': '', 'minor_ea': ''}",
+      "evidence": "work/\\deck.pptx!ppt/theme/theme1.xml:2"
+    },
+    {
+      "id": "V09",
+      "name": "footer/slide-number placeholders still present and unfilled",
+      "status": "PASS",
+      "detail": "footer/slide-number/date placeholders survive in the deck's masters and layouts and no slide writes text into them; the deck inherits them from the template rather than replacing them",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V10",
+      "name": "no text overflow (estimated extent <= shape extent)",
+      "status": "PASS",
+      "detail": "16 text shape(s) measured from deck geometry with real font advances; none exceed their box or leave the slide. Shapes carrying normAutofit shrink their text (not clipped) and spAutoFit shapes were checked against the slide box instead of their own. rendered PDF cross-checked: 8 page(s), 0 word(s) outside the page box | 3 shape(s) rely on normAutofit shrink-to-fit: slide 1: Title 1: needs~146.4pt vs box 108.5pt, lines=4 (normAutofit shrinks text); slide 1: Subtitle 2: needs~132.0pt vs box 130.8pt, lines=4 (normAutofit shrinks text); slide 6: Title 1: needs~86.4pt vs box 82.8pt, lines=2 (normAutofit shrinks text)",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V11",
+      "name": "images inside their shape bounds (not cropped)",
+      "status": "PASS",
+      "detail": "2 picture shape(s) checked: no non-zero srcRect crop and every frame lies inside the slide box, read from the shapes' own OOXML",
+      "evidence": "work/\\deck.pptx:1"
+    },
+    {
+      "id": "V12",
+      "name": "fonts used are resolvable and substitution is reported",
+      "status": "PASS",
+      "detail": "1 declared typeface(s) are not installed on this host (['Liberation Serif']) and every one of them is openly reported as substituted, so the substitution is visible rather than hidden",
+      "evidence": "work/\\render_report.json:1"
+    },
+    {
+      "id": "V13",
+      "name": "result.json contains every key declared in case.json.output_contract",
+      "status": "PASS",
+      "detail": "all 10 declared key(s) are present in result.json; 1 are null/empty and each is explained in uncertainty: ['change_records']",
+      "evidence": "output/\\result.json:2"
+    },
+    {
+      "id": "V14",
+      "name": "evidence map covers every slide",
+      "status": "PASS",
+      "detail": "all 8 slide(s) have a non-empty evidence entry with a locator (20 claim(s) marked verified)",
+      "evidence": "work/\\evidence_map.json:4"
+    },
+    {
+      "id": "V15",
+      "name": "version records exist (v1 + changes + diff + rollback)",
+      "status": "PASS",
+      "detail": "v1 + change records + diff + rollback all present across ['change_records.json', 'diff-v1.md', 'rollback.md', 'versions.json']",
+      "evidence": "output/\\change_records.json:77"
+    },
+    {
+      "id": "V16",
+      "name": "no duplicate slide content",
+      "status": "PASS",
+      "detail": "27 title/bullet/notes unit(s) checked across 8 slide(s): no bullet fingerprint repeats (a leading 'Label:' prefix is stripped first, and bullets under 20 characters are ignored so short role labels are not false positives); no title/bullet is identical to, contained in, or >=70% content-word-overlapping with another's; no notes are exactly repeated",
+      "evidence": "work/\\plan.json:230"
+    },
+    {
+      "id": "V17",
+      "name": "no constraint/input leakage into content",
+      "status": "PASS",
+      "detail": "27 unit(s) scanned against the declared metadata (['audience', 'duration_min', 'language', 'template', 'template_path']): no slide title, bullet or note carries a labelled brief field, the declared audience text, the template file name, or the declared duration",
+      "evidence": "input/\\case.json:18"
+    },
+    {
+      "id": "V18",
+      "name": "build_report describes the deck under inspection",
+      "status": "PASS",
+      "detail": "build_report.pptx names the same deck file that was inspected",
+      "evidence": "work/\\build_report.json:27"
+    },
+    {
+      "id": "V19",
+      "name": "minimum content coverage",
+      "status": "PASS",
+      "detail": "the run had enough to work with: coverage: 8 slide(s), 11 bullet(s), 23 distinct number(s) on slides, figures used 1/4, tables used 1/2, extracted 13880 chars from 3 source file(s). 1 advisory note(s).",
+      "evidence": "work/\\material.json:356"
+    }
+  ],
+  "counts": {
+    "PASS": 19,
+    "FAIL": 0,
+    "SKIP": 0,
+    "UNVERIFIED": 0
+  },
+  "verdict": "PASS",
+  "defects": [],
+  "warnings": [
+    {
+      "check": "V19",
+      "detail": "figure/table item(s) ['fig2', 'fig3', 'fig4', 'tab2'] from the source are never referenced and are not listed in plan.excluded; this is advisory (a deck need not use every figure) but the audit trail is thinner than it could be"
+    }
+  ],
+  "coverage": {
+    "slides": 8,
+    "bullets_total": 11,
+    "extracted_chars": 13880,
+    "declared_source_files": 3,
+    "declared_source_bytes": 376268,
+    "material": {
+      "figures": 4,
+      "tables": 2,
+      "numbers": 370,
+      "claims": 39
+    },
+    "deck_numbers": 23,
+    "figures_referenced": [
+      "fig1"
+    ],
+    "tables_referenced": [
+      "tab1"
+    ],
+    "title_only_content_slides": []
+  },
+  "evidence_format": "path:line for files, <container>!<part>:line for OOXML parts",
+  "artifacts": {
+    "deck": "work/\\deck.pptx",
+    "deck_path_source": "work-dir",
+    "build_report_pptx": "work/\\deck.pptx",
+    "deck_sha256": "96b175a93ebccf8818619f03e7a893a98e0d2f9855433d5f386d512f7f52b109",
+    "plan": "work/\\plan.json",
+    "material": "work/\\material.json",
+    "build_report": "work/\\build_report.json",
+    "render_report": "work/\\render_report.json",
+    "evidence_map": "work/\\evidence_map.json",
+    "result": "output/\\result.json",
+    "template": "input/\\materials\\template-organizer.pptx"
+  },
+  "scope": {
+    "V07_V08_V09": "OXML-level comparison against the template's own parts, when the template is locatable",
+    "V04": "re-derived from material.json plus the text on the deck's slides, not from plan.json",
+    "V10_V11": "deck geometry; V10 additionally cross-checks the rendered PDF when one exists",
+    "not_certified": "technical text checks do not certify scientific correctness or presentation quality (task/task.md:97)"
+  }
+}

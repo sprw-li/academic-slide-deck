@@ -1,0 +1,1196 @@
+{
+  "case_id": "SYNTHETIC-EXP-001",
+  "constraints": {
+    "_sources": {
+      "audience": "case.json (task.md says '课题组组会 (supervisor + peer graduate students), mixed theoretical/experimental')",
+      "duration_min": "case.json",
+      "language": "case.json",
+      "slide_count": "case.json",
+      "slide_count_range": null,
+      "sources": "case.json",
+      "starting_deck_path": null,
+      "template_path": "case.json",
+      "title": null,
+      "tone": null
+    },
+    "_task_card": "input/\\task.md",
+    "audience": "课题组组会 (supervisor + peer graduate students)",
+    "duration_min": 10.0,
+    "language": "en",
+    "layout_hints_available": {
+      "picture-caption": {
+        "hint": "picture-caption",
+        "layout_name": "Picture with Caption",
+        "resolved": true
+      },
+      "title": {
+        "hint": "title",
+        "layout_name": "Title Slide",
+        "resolved": true
+      },
+      "title-content": {
+        "hint": "title-content",
+        "layout_name": "Title and Content",
+        "resolved": true
+      }
+    },
+    "slide_count": 8,
+    "slide_count_range": null,
+    "starting_deck_path": null,
+    "template_layouts": [
+      "Title Slide",
+      "Title and Content",
+      "Section Header",
+      "Two Content",
+      "Comparison",
+      "Title Only",
+      "Blank",
+      "Content with Caption",
+      "Picture with Caption",
+      "Title and Vertical Text",
+      "Vertical Title and Text"
+    ],
+    "template_path": "input/\\materials\\template-organizer.pptx"
+  },
+  "excluded": [
+    {
+      "item": "cl1",
+      "reason": "not a bullet: the sentence is 235 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl2",
+      "reason": "not a bullet: the sentence is 127 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl3",
+      "reason": "not a bullet: the sentence is 183 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl4",
+      "reason": "not a bullet: the sentence is 151 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl8",
+      "reason": "not a bullet: the sentence is 163 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl9",
+      "reason": "not a bullet: the sentence is 144 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl10",
+      "reason": "not a bullet: the sentence is 135 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl11",
+      "reason": "not a bullet: 'This work reports a single N-TiO2 series prepared at one cal' is a 178-character continuation or unterminated fragment, not a whole statement"
+    },
+    {
+      "item": "cl13",
+      "reason": "not a bullet: the sentence is 129 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl16",
+      "reason": "not a bullet: the sentence is 158 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl21",
+      "reason": "not a bullet: the sentence is 130 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl22",
+      "reason": "not a bullet: 'This panel is a drawing, not a micrograph.' is a 42-character continuation or unterminated fragment, not a whole statement"
+    },
+    {
+      "item": "cl23",
+      "reason": "not a bullet: the sentence is 155 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl25",
+      "reason": "not a bullet: the sentence is 130 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl26",
+      "reason": "not a bullet: the sentence is 132 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl28",
+      "reason": "kept off the content pages: it reads as neither a gap, a method, a finding, a caveat nor a conclusion (best role cue score 0), so it is not presented under a role label"
+    },
+    {
+      "item": "cl31",
+      "reason": "not a bullet: the sentence is 208 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl32",
+      "reason": "not a bullet: the sentence is 232 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl33",
+      "reason": "not a bullet: the sentence is 138 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl34",
+      "reason": "not a bullet: the sentence is 160 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl36",
+      "reason": "not a bullet: the sentence is 173 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl37",
+      "reason": "not a bullet: the sentence is 150 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl38",
+      "reason": "kept off every content page: the sentence is a bibliography entry from the references section, not a finding, a method or a gap"
+    },
+    {
+      "item": "cl39",
+      "reason": "not a bullet: the sentence is 151 chars, over the 120-char limit, and trimming it would cut a value"
+    },
+    {
+      "item": "cl12",
+      "reason": "no bullet: the problem page already has 3 bullets, the contract maximum"
+    },
+    {
+      "item": "cl18",
+      "reason": "no bullet: the method page already has 3 bullets, the contract maximum"
+    },
+    {
+      "item": "Composition and textural properties of the synthetic series.",
+      "reason": "bullet removed from slide 11: its wording already appears on an earlier page or in a title of this deck"
+    },
+    {
+      "item": "Kinetic parameters from the synthetic degradation runs.",
+      "reason": "bullet removed from slide 12: its wording already appears on an earlier page or in a title of this deck"
+    },
+    {
+      "item": "Results Phase analysis detected anatase only; no rutile or T",
+      "reason": "bullet removed from slide 14: its wording already appears on an earlier page or in a title of this deck"
+    },
+    {
+      "item": "slide 2 (outline) 'Outline'",
+      "reason": "not kept: the case allows 8 slides and the outline role (rank 8) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "slide 6 (result) 'Key result: Results (second)'",
+      "reason": "not kept: the case allows 8 slides and the result role (rank 3) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "slide 8 (figure) 'Figure: Normalised methylene blue'",
+      "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "slide 9 (figure) 'Figure: Pseudo-first-order'",
+      "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "slide 10 (figure) 'Figure: Removal of methylene blue'",
+      "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "slide 12 (table) 'Table: Kinetic parameters from the synthetic degradation runs'",
+      "reason": "not kept: the case allows 8 slides and the table role (rank 6) sits below the figure/table/limitation pages that were kept"
+    },
+    {
+      "item": "fig2 (figure Figure 2)",
+      "reason": "not placed: the deck is 8 slides and the kept figure, table, limitation and conclusion pages rank higher; the exhibit stays available in material.json with its locator"
+    },
+    {
+      "item": "fig3 (figure Figure 3)",
+      "reason": "not placed: the deck is 8 slides and the kept figure, table, limitation and conclusion pages rank higher; the exhibit stays available in material.json with its locator"
+    },
+    {
+      "item": "fig4 (figure Figure 4)",
+      "reason": "not placed: the deck is 8 slides and the kept figure, table, limitation and conclusion pages rank higher; the exhibit stays available in material.json with its locator"
+    },
+    {
+      "item": "tab2 (table Table 2)",
+      "reason": "not placed: the deck is 8 slides and the kept pages rank higher; its cells stay available in material.json with their locator"
+    }
+  ],
+  "generated": "2026-11-23T05:56:37Z",
+  "narrative": {
+    "arc": "problem -> method -> result -> limitation -> conclusion",
+    "main_thread": [
+      "1. title — Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
+      "2. problem — Problem: Abstract",
+      "3. method — Method: Materials and Methods",
+      "4. result — Key result: Results",
+      "5. figure — Figure: Synthetic schematic",
+      "6. table — Table: Composition and textural properties of the synthetic series",
+      "7. limitation — Limitations",
+      "8. conclusion — Conclusion"
+    ]
+  },
+  "schema": "plan/v1",
+  "slides": [
+    {
+      "bullets": [],
+      "claim": "Nitrogen-doped titanium dioxide (N-TiO2) powders were prepared by a urea-assisted sol-gel route and calcined at 500 °C for 4 h.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study Synthetic Author Group — FIXTURE TEXT, NOT A REAL PUBLICATION SYNTHETIC / NOT AN OFFICIAL CASE — every number in this file is invented.",
+            "source": "src1"
+          },
+          "ref": "claim",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 1,
+      "layout_hint": "title",
+      "layout_name": "Title Slide",
+      "notes": "Open by naming the audience, the time budget and the single message of the talk before any detail appears. Key claim: Nitrogen-doped titanium dioxide (N-TiO2) powders were prepared by a urea-assisted sol-gel route and calcined at 500 °C for 4 h. Traceability: the text on this page is quoted from paper.docx.",
+      "numbers_used": [],
+      "role": "title",
+      "table_ref": null,
+      "title": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study"
+    },
+    {
+      "bullets": [
+        "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+        "Five consecutive reuse cycles retained 88.1 % of the initial activity.",
+        "Every value in this paragraph is invented for the fixture."
+      ],
+      "claim": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl5",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Five consecutive reuse cycles retained 88.1 % of the initial activity.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl6",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Every value in this paragraph is invented for the fixture.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl7",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 2,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "State the research gap in one breath and let the audience see why it matters scientifically, not commercially. Key claim: The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994. Traceability: the text on this page is quoted from paper.docx. It sits in the Abstract part of the source.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "4.",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "",
+          "value": 4.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src2"
+          },
+          "raw": "0.0312",
+          "unit": "min",
+          "value": 0.0312
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src2"
+          },
+          "raw": "0.994",
+          "unit": "",
+          "value": 0.994
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src2"
+          },
+          "raw": "0.0312",
+          "unit": "",
+          "value": 0.0312
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src2"
+          },
+          "raw": "1",
+          "unit": "",
+          "value": 1.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+            "source": "src2"
+          },
+          "raw": "2",
+          "unit": "",
+          "value": 2.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "reuse cycles retained 88.1 % of the initial activity.",
+            "source": "src2"
+          },
+          "raw": "88.1",
+          "unit": "",
+          "value": 88.1
+        }
+      ],
+      "role": "problem",
+      "table_ref": null,
+      "title": "Problem: Abstract"
+    },
+    {
+      "bullets": [
+        "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+        "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+        "Aliquots of 3 mL were taken at 0, 10, 20, 30, 40, 50 and 60 min and centrifuged at 9000 rpm for 5 min."
+      ],
+      "claim": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl14",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl15",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30, 40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl17",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 3,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "Compress the procedure to the minimum a peer needs in order to trust the result; name the measurements and the sample size. Key claim: The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min. Traceability: the text on this page is quoted from paper.docx. It sits in the Materials and Methods part of the source.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "80",
+          "unit": "°C",
+          "value": 80.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "12",
+          "unit": "h",
+          "value": 12.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "500",
+          "unit": "°C",
+          "value": 500.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "h",
+          "value": 4.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "5",
+          "unit": "°C",
+          "value": 5.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "80",
+          "unit": "",
+          "value": 80.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "12",
+          "unit": "",
+          "value": 12.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "500",
+          "unit": "",
+          "value": 500.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "",
+          "value": 4.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The gel was dried at 80 °C for 12 h and calcined in static air at 500 °C for 4 h with a ramp of 5 °C/min.",
+            "source": "src1"
+          },
+          "raw": "5",
+          "unit": "",
+          "value": 5.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+            "source": "src1"
+          },
+          "raw": "20",
+          "unit": "",
+          "value": 20.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "X-ray diffraction used Cu K-alpha radiation over 2theta = 20-80 degrees.",
+            "source": "src1"
+          },
+          "raw": "2",
+          "unit": "",
+          "value": 2.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "raw": "3",
+          "unit": "mL",
+          "value": 3.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "raw": "10",
+          "unit": "",
+          "value": 10.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "raw": "30",
+          "unit": "",
+          "value": 30.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "raw": "3",
+          "unit": "",
+          "value": 3.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Aliquots of 3 mL were taken at 0, 10, 20, 30,",
+            "source": "src2"
+          },
+          "raw": "0",
+          "unit": "",
+          "value": 0.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "40",
+          "unit": "",
+          "value": 40.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "50",
+          "unit": "",
+          "value": 50.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "60",
+          "unit": "min",
+          "value": 60.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "9000",
+          "unit": "rpm",
+          "value": 9000.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "5",
+          "unit": "min",
+          "value": 5.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "60",
+          "unit": "",
+          "value": 60.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "40, 50 and 60 min and centrifuged at 9000 rpm for 5 min.",
+            "source": "src2"
+          },
+          "raw": "9000",
+          "unit": "",
+          "value": 9000.0
+        }
+      ],
+      "role": "method",
+      "table_ref": null,
+      "title": "Method: Materials and Methods"
+    },
+    {
+      "bullets": [
+        "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+        "The nitrogen content from CHN analysis was 3.4 at.%.",
+        "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm."
+      ],
+      "claim": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl19",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl20",
+          "type": "claim"
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl24",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 4,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "Give the headline number first, then the comparison it is measured against, then what the comparison rules out. Key claim: Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit. Traceability: the text on this page is quoted from paper.docx. It sits in the Results part of the source.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "raw": "0.5",
+          "unit": "",
+          "value": 0.5
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "3.",
+            "source": "src1"
+          },
+          "raw": "3",
+          "unit": "",
+          "value": 3.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "source": "src1"
+          },
+          "raw": "3.4",
+          "unit": "",
+          "value": 3.4
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "raw": "0.21",
+          "unit": "",
+          "value": 0.21
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "raw": "9.4",
+          "unit": "nm",
+          "value": 9.4
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm.",
+            "source": "src1"
+          },
+          "raw": "9.4",
+          "unit": "",
+          "value": 9.4
+        }
+      ],
+      "role": "result",
+      "table_ref": null,
+      "title": "Key result: Results"
+    },
+    {
+      "bullets": [
+        "Synthetic schematic of the urea-assisted sol-gel route used."
+      ],
+      "claim": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h). This panel is a drawing, not a micrograph.",
+            "source": "src1"
+          },
+          "note": "labelled \"Figure 1\" in the source",
+          "ref": "fig1",
+          "type": "figure"
+        }
+      ],
+      "figure_ref": "fig1",
+      "index": 5,
+      "layout_hint": "picture-caption",
+      "layout_name": "Picture with Caption",
+      "notes": "Point at the axis and the comparison before discussing the shape of the distribution; the figure is the evidence for the claim on this page. Key claim: Figure 1. Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h). Traceability: the text on this page is quoted from paper.docx.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "raw": "1",
+          "unit": "",
+          "value": 1.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+            "source": "src1"
+          },
+          "raw": "500",
+          "unit": "°C",
+          "value": 500.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "h",
+          "value": 4.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+            "source": "src1"
+          },
+          "raw": "2",
+          "unit": "",
+          "value": 2.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+            "source": "src1"
+          },
+          "raw": "500",
+          "unit": "",
+          "value": 500.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Synthetic schematic of the urea-assisted sol-gel route used for the N-TiO2 series (calcination 500 °C, 4 h).",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "",
+          "value": 4.0
+        }
+      ],
+      "role": "figure",
+      "table_ref": null,
+      "title": "Figure: Synthetic schematic"
+    },
+    {
+      "bullets": [],
+      "claim": "Table 1. Composition and textural properties of the synthetic series.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Table 1. Composition and textural properties of the synthetic series.",
+            "source": "src1"
+          },
+          "note": "cells taken verbatim from the source table",
+          "ref": "tab1",
+          "type": "table"
+        }
+      ],
+      "figure_ref": null,
+      "index": 6,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "Read only the columns that support the claim; the remaining columns stay available for questions. Key claim: Table 1. Composition and textural properties of the synthetic series. Traceability: the text on this page is quoted from paper.docx.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "1.",
+            "source": "src1"
+          },
+          "raw": "1",
+          "unit": "",
+          "value": 1.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "2.",
+            "source": "src1"
+          },
+          "raw": "2",
+          "unit": "",
+          "value": 2.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "3.",
+            "source": "src1"
+          },
+          "raw": "3",
+          "unit": "",
+          "value": 3.0
+        },
+        {
+          "locator": {
+            "page": 1,
+            "quote": "4.",
+            "source": "src1"
+          },
+          "raw": "4",
+          "unit": "",
+          "value": 4.0
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "Undoped TiO2 0.0 41.2 18.9 3.18",
+            "source": "src2"
+          },
+          "raw": "0.0",
+          "unit": "",
+          "value": 0.0
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "Undoped TiO2 0.0 41.2 18.9 3.18",
+            "source": "src2"
+          },
+          "raw": "41.2",
+          "unit": "",
+          "value": 41.2
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "Undoped TiO2 0.0 41.2 18.9 3.18",
+            "source": "src2"
+          },
+          "raw": "18.9",
+          "unit": "",
+          "value": 18.9
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "Undoped TiO2 0.0 41.2 18.9 3.18",
+            "source": "src2"
+          },
+          "raw": "3.18",
+          "unit": "",
+          "value": 3.18
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-0.5 0.9 63.4 14.6 3.02",
+            "source": "src2"
+          },
+          "raw": "0.5",
+          "unit": "",
+          "value": 0.5
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-0.5 0.9 63.4 14.6 3.02",
+            "source": "src2"
+          },
+          "raw": "0.9",
+          "unit": "",
+          "value": 0.9
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-0.5 0.9 63.4 14.6 3.02",
+            "source": "src2"
+          },
+          "raw": "63.4",
+          "unit": "",
+          "value": 63.4
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-0.5 0.9 63.4 14.6 3.02",
+            "source": "src2"
+          },
+          "raw": "14.6",
+          "unit": "",
+          "value": 14.6
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-0.5 0.9 63.4 14.6 3.02",
+            "source": "src2"
+          },
+          "raw": "3.02",
+          "unit": "",
+          "value": 3.02
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-1.0 1.8 71.9 13.1 2.91",
+            "source": "src2"
+          },
+          "raw": "1.0",
+          "unit": "",
+          "value": 1.0
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-1.0 1.8 71.9 13.1 2.91",
+            "source": "src2"
+          },
+          "raw": "1.8",
+          "unit": "",
+          "value": 1.8
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-1.0 1.8 71.9 13.1 2.91",
+            "source": "src2"
+          },
+          "raw": "71.9",
+          "unit": "",
+          "value": 71.9
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-1.0 1.8 71.9 13.1 2.91",
+            "source": "src2"
+          },
+          "raw": "13.1",
+          "unit": "",
+          "value": 13.1
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-1.0 1.8 71.9 13.1 2.91",
+            "source": "src2"
+          },
+          "raw": "2.91",
+          "unit": "",
+          "value": 2.91
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-2.0 3.4 78.6 12.3 2.84",
+            "source": "src2"
+          },
+          "raw": "2.0",
+          "unit": "",
+          "value": 2.0
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-2.0 3.4 78.6 12.3 2.84",
+            "source": "src2"
+          },
+          "raw": "3.4",
+          "unit": "",
+          "value": 3.4
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-2.0 3.4 78.6 12.3 2.84",
+            "source": "src2"
+          },
+          "raw": "78.6",
+          "unit": "",
+          "value": 78.6
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-2.0 3.4 78.6 12.3 2.84",
+            "source": "src2"
+          },
+          "raw": "12.3",
+          "unit": "",
+          "value": 12.3
+        },
+        {
+          "locator": {
+            "page": 2,
+            "quote": "N-TiO2-2.0 3.4 78.6 12.3 2.84",
+            "source": "src2"
+          },
+          "raw": "2.84",
+          "unit": "",
+          "value": 2.84
+        }
+      ],
+      "role": "table",
+      "table_ref": "tab1",
+      "title": "Table: Composition and textural properties of the synthetic series"
+    },
+    {
+      "bullets": [
+        "The study uses a single dye, a single catalyst dose and one calcination temperature."
+      ],
+      "claim": "The study uses a single dye, a single catalyst dose and one calcination temperature.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "The study uses a single dye, a single catalyst dose and one calcination temperature.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "cl35",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 7,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "Name the limitation honestly and pair it with what it does not invalidate; this is what makes the conclusion defensible. Key claim: The study uses a single dye, a single catalyst dose and one calcination temperature. Traceability: the text on this page is quoted from paper.docx. It sits in the Limitations part of the source.",
+      "numbers_used": [],
+      "role": "limitation",
+      "table_ref": null,
+      "title": "Limitations"
+    },
+    {
+      "bullets": [],
+      "claim": "Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+      "evidence": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "note": "verbatim sentence from the source material",
+          "ref": "claim",
+          "type": "claim"
+        }
+      ],
+      "figure_ref": null,
+      "index": 8,
+      "layout_hint": "title-content",
+      "layout_name": "Title and Content",
+      "notes": "Restate the claim once with the evidence visible on the previous pages, then stop talking. Key claim: Results Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit. Traceability: the text on this page is quoted from paper.docx.",
+      "numbers_used": [
+        {
+          "locator": {
+            "page": 1,
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "source": "src1"
+          },
+          "raw": "0.5",
+          "unit": "",
+          "value": 0.5
+        }
+      ],
+      "role": "conclusion",
+      "table_ref": null,
+      "title": "Conclusion"
+    }
+  ],
+  "stats": {
+    "bullets": 11,
+    "excluded": 39,
+    "figures_used": 1,
+    "numbers_used": 67,
+    "slides": 8,
+    "tables_used": 1,
+    "warnings": 1
+  },
+  "uncertainty": [
+    "3 page(s) carry no bullet list because the material offered no whole sentence for them; their claim and evidence are still recorded"
+  ],
+  "warnings": [
+    "task card read for constraints: task.md (fields taken from the task card are recorded in constraints._sources)"
+  ]
+}

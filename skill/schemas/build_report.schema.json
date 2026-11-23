@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "build_report/v1",
+  "title": "build_report.json (build_report/v1)",
+  "description": "What build_deck.py did to the case template. master_unchanged / theme_unchanged are byte-level facts: after saving, the master, layout and theme parts are restored byte-for-byte from the template package and then compared. pptx is an absolute runtime path because the report must name the exact deck it describes.",
+  "type": "object",
+  "required": ["schema", "pptx", "sha256", "template", "invariants", "slides", "fonts_used", "warnings"],
+  "properties": {
+    "schema": {"const": "build_report/v1"},
+    "case_id": {"type": "string"},
+    "generated": {"type": "string"},
+    "mode": {"enum": ["built-from-template", "adapted-from-starting-deck"]},
+    "pptx": {"type": "string", "description": "absolute path of the deck this report describes"},
+    "pptx_rel": {"type": "string", "description": "same file relative to the work directory"},
+    "sha256": {"type": "string"},
+    "bytes": {"type": "integer"},
+    "template": {
+      "type": "object",
+      "required": ["path", "sha256", "masters", "layouts", "theme_fonts"],
+      "properties": {
+        "path": {"type": "string"},
+        "path_rel": {"type": "string"},
+        "sha256": {"type": "string"},
+        "masters": {"type": "integer"},
+        "layouts": {"type": "integer"},
+        "layout_names": {"type": "array", "items": {"type": "string"}},
+        "theme_fonts": {
+          "type": "object",
+          "required": ["major_latin", "minor_latin", "major_ea", "minor_ea"],
+          "properties": {
+            "major_latin": {"type": "string"}, "minor_latin": {"type": "string"},
+            "major_ea": {"type": "string"}, "minor_ea": {"type": "string"}
+          }
+        }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "required": ["master_unchanged", "theme_unchanged", "footer_preserved", "layouts_added", "layouts_deleted"],
+      "properties": {
+        "master_unchanged": {"type": "boolean"},
+        "theme_unchanged": {"type": "boolean"},
+        "footer_preserved": {"type": "boolean"},
+        "layouts_added": {"type": "integer"},
+        "layouts_deleted": {"type": "integer"},
+        "layouts_changed": {"type": "integer"},
+        "footer_placeholders": {"type": "object"},
+        "protected_parts_restored": {"type": "integer"},
+        "protected_parts_changed": {"type": "array", "items": {"type": "string"}},
+        "protected_parts_missing": {"type": "array", "items": {"type": "string"}},
+        "parts_added": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "slides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "layout", "placeholders_filled", "overflow_risk", "notes_chars", "images"],
+        "properties": {
+          "index": {"type": "integer"},
+          "layout": {"type": "string", "description": "layout actually used, read from the template"},
+          "placeholders_filled": {"type": "array", "items": {"type": "string"}},
+          "overflow_risk": {"enum": ["low", "medium", "high"]},
+          "overflow_detail": {"type": "array", "items": {"type": "object"}},
+          "shrink_to_fit": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {"shape": {"type": "string"}, "from_pt": {"type": "number"},
+                             "to_pt": {"type": "number"}, "runs": {"type": "integer"},
+                             "autofit": {"type": "boolean"}, "reason": {"type": "string"}}
+            }
+          },
+          "autofit_frames": {"type": "integer", "description": "frames given <a:normAutofit/>"},
+          "notes_chars": {"type": "integer"},
+          "furniture_cloned": {"type": "integer"},
+          "furniture_present": {"type": "array", "items": {"type": "string"}},
+          "furniture_text_cleared": {"type": "integer"},
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["source_ref", "mode"],
+              "properties": {
+                "source_ref": {"type": "string", "description": "fig*/tab* id in material.json"},
+                "mode": {"enum": ["source-crop", "redraw-from-data", "reference-only"]},
+                "path": {"type": "string"}, "sha256": {"type": "string"},
+                "backend": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "fonts_used": {"type": "array", "items": {"type": "string"}},
+    "slide_size": {"type": "object"},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "stats": {"type": "object"}
+  }
+}

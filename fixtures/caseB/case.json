@@ -1,0 +1,46 @@
+{
+  "case_id": "SYNTHETIC-REV-002",
+  "note": "SYNTHETIC / NOT AN OFFICIAL CASE. Fixture built by work/fixtures/build_paper.py for self-testing only. The paper, the figures, the tables and every number are invented for this fixture; they are internally consistent inside the case but are NOT measurements and must never be presented as real results. The template is an organizer-style synthetic template, not a real organizer file.",
+  "paper_type": "review/theory",
+  "output_contract": {
+    "case_id": "",
+    "pptx": "",
+    "pdf": "",
+    "previews": [],
+    "notes": "",
+    "evidence": "",
+    "outline": "",
+    "status": "",
+    "uncertainty": []
+  },
+  "constraints": {
+    "audience": "理论组 seminar with one external reviewer",
+    "duration_min": 20,
+    "slide_count": 12,
+    "slide_count_range": [
+      11,
+      12
+    ],
+    "language": "en",
+    "template_path": "materials/template-organizer.pptx",
+    "starting_deck_path": null
+  },
+  "materials_dir": "materials",
+  "template": "materials/template-organizer.pptx",
+  "sources": [
+    "materials/paper.pdf",
+    "materials/paper.docx"
+  ],
+  "starting_deck": null,
+  "synth": {
+    "builder": "work/fixtures/build_paper.py",
+    "figures": [
+      "materials/figures/figure1-selection.png",
+      "materials/figures/figure2-mae.png",
+      "materials/figures/figure3-parity.png"
+    ],
+    "distinct_numbers_in_text": 44,
+    "pdf_pages": 4,
+    "pdf_embedded_images": 12
+  }
+}

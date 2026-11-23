@@ -1,0 +1,164 @@
+{
+  "_excerpt": "key fields of the real build_report.json (slide image/provenance detail trimmed); paths sanitized for shipping",
+  "schema": "build_report/v1",
+  "template": {
+    "layout_names": [
+      "Title Slide",
+      "Title and Content",
+      "Section Header",
+      "Two Content",
+      "Comparison",
+      "Title Only",
+      "Blank",
+      "Content with Caption",
+      "Picture with Caption",
+      "Title and Vertical Text",
+      "Vertical Title and Text"
+    ],
+    "layouts": 11,
+    "masters": 1,
+    "path": "input/\\materials\\template-organizer.pptx",
+    "path_rel": "../caseA/materials/template-organizer.pptx",
+    "sha256": "9bb7eb08616f7a78f45b157d4e0ca114b17236edc7b875048f915cedbf045ad9",
+    "theme_fonts": {
+      "major_ea": "",
+      "major_latin": "Liberation Serif",
+      "minor_ea": "",
+      "minor_latin": "Liberation Serif"
+    }
+  },
+  "invariants": {
+    "footer_placeholders": {
+      "slides": 8,
+      "slides_with_footer": 8
+    },
+    "footer_preserved": true,
+    "layouts_added": 0,
+    "layouts_changed": 0,
+    "layouts_deleted": 0,
+    "master_unchanged": true,
+    "parts_added": [
+      "ppt/theme/theme2.xml"
+    ],
+    "protected_parts_changed": [],
+    "protected_parts_missing": [],
+    "protected_parts_restored": 25,
+    "theme_unchanged": true
+  },
+  "fonts_used": [
+    "Liberation Serif"
+  ],
+  "warnings": [
+    "slide 1: Title 1 text was fitted from 44pt to 29pt so it stays inside its placeholder",
+    "slide 1: Subtitle 2 text was fitted from 32pt to 26pt so it stays inside its placeholder",
+    "slide 6: Title 1 text was fitted from 44pt to 33pt so it stays inside its placeholder"
+  ],
+  "slides": [
+    {
+      "index": 1,
+      "layout": "Title Slide",
+      "placeholders_filled": [
+        "title",
+        "Subtitle 2"
+      ],
+      "overflow_risk": "high",
+      "notes_chars": 308,
+      "images": []
+    },
+    {
+      "index": 2,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "overflow_risk": "medium",
+      "notes_chars": 328,
+      "images": []
+    },
+    {
+      "index": 3,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "overflow_risk": "high",
+      "notes_chars": 360,
+      "images": []
+    },
+    {
+      "index": 4,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "overflow_risk": "medium",
+      "notes_chars": 334,
+      "images": []
+    },
+    {
+      "index": 5,
+      "layout": "Picture with Caption",
+      "placeholders_filled": [
+        "title",
+        "Text Placeholder 3",
+        "Picture Placeholder 2 (picture placed)"
+      ],
+      "overflow_risk": "medium",
+      "notes_chars": 333,
+      "images": [
+        {
+          "backend": "docx-embedded",
+          "mode": "source-crop",
+          "path": "figures/fig1.png",
+          "sha256": "c8a49086972fe907bcbe49f01880d3ca54db45c57742f4200fa3bc51a963613a",
+          "source_ref": "fig1"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2",
+        "table(5x5)"
+      ],
+      "overflow_risk": "medium",
+      "notes_chars": 241,
+      "images": [
+        {
+          "backend": "matplotlib (values parsed from the source table)",
+          "mode": "redraw-from-data",
+          "path": "derived/tab1-redraw.png",
+          "sha256": "cf5437b03615425c5c41865a920d34b776efeb23e55c7d4ce9b293ecba7d2b82",
+          "source_ref": "tab1"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "overflow_risk": "low",
+      "notes_chars": 326,
+      "images": []
+    },
+    {
+      "index": 8,
+      "layout": "Title and Content",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "overflow_risk": "low",
+      "notes_chars": 278,
+      "images": []
+    }
+  ]
+}

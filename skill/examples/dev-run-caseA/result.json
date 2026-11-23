@@ -1,0 +1,102 @@
+{
+  "case_id": "SYNTHETIC-EXP-001",
+  "deck_pptx": "output/\\deck.pptx",
+  "deck_pdf": "output/\\render\\deck.pdf",
+  "slide_previews": [
+    "work/\\render\\slide-01.png",
+    "work/\\render\\slide-02.png",
+    "work/\\render\\slide-03.png",
+    "work/\\render\\slide-04.png",
+    "work/\\render\\slide-05.png",
+    "work/\\render\\slide-06.png",
+    "work/\\render\\slide-07.png",
+    "work/\\render\\slide-08.png"
+  ],
+  "speaker_notes": "output/\\speaker-notes.md",
+  "page_evidence_map": "output/\\evidence_map.json",
+  "plan": "output/\\plan.json",
+  "status": "ok",
+  "uncertainty": [
+    "material: src2: table 1 on page 2 kept with no cells (no matching detected grid)",
+    "material: src2: table 2 on page 3 kept with no cells (no matching detected grid)",
+    "material: src3: no numbered/section headings detected; treated the whole document as one section",
+    "material: claim 'Synthetic schematic of the urea-assisted sol-gel route used ' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "material: claim 'Composition and textural properties of the synthetic series.' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "material: claim 'Normalised methylene blue concentration versus irradiation t' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "material: claim 'Pseudo-first-order transformation of the N-TiO2-2.0 data; th' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "material: claim 'Kinetic parameters from the synthetic degradation runs.' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "material: claim 'Removal of methylene blue after 60 min over five consecutive' dropped: it is the wording of a figure/table caption, which already appears on the exhibit's own page",
+    "plan: 3 page(s) carry no bullet list because the material offered no whole sentence for them; their claim and evidence are still recorded",
+    "render: The renderer could not find these font families: Liberation Serif -- glyphs are therefore substituted, so the previews are a substitute render and must not be read as a certificate of font fidelity. Measured: the exported PDF embeds /BAAAAA+TimesNewRomanPSMT, /CAAAAA+TimesNewRomanPSMT, /DAAAAA+TimesNewRomanPSMT, /EAAAAA+TimesNewRomanPSMT, /FAAAAA+ArialMT, /GAAAAA+TimesNewRomanPSMT, /HAAAAA+TimesNewRomanPS-BoldMT, /IAAAAA+TimesNewRomanPSMT, /JAAAAA+TimesNewRomanPSMT, /KAAAAA+TimesNewRomanPSMT instead.",
+    "No version/change record artefact was found, so the change history cannot be attested for this run.",
+    "Technical file and OOXML checks validate structure and traceability only; they do not certify that the presentation is scientifically correct or well presented (task/task.md:97). Scores are assigned by the platform, not by this file.",
+    "output_contract key 'change_records' maps to 'exact' but that artefact was not produced, so it is []"
+  ],
+  "change_records": [],
+  "sources": [
+    {
+      "path": "input/\\..\\caseA\\materials\\paper.docx",
+      "sha256": "4c07b0d2428b4f7f99bf9e3694565a56f77cd162c3998a85f91c461afa02cd71",
+      "role": "source"
+    },
+    {
+      "path": "input/\\..\\caseA\\materials\\paper.pdf",
+      "sha256": "3cf6a41402c19f9cf1343ac09fb9f3f56265e0137af3aed1929ce7bf778e62ac",
+      "role": "source"
+    },
+    {
+      "path": "input/\\..\\caseA\\task.md",
+      "sha256": "152630b5f406acdd16bdd2b990c0fca63166ddf83475e4c46b680dd0c8d5df72",
+      "role": "source"
+    },
+    {
+      "path": "input/\\materials\\template-organizer.pptx",
+      "sha256": "9bb7eb08616f7a78f45b157d4e0ca114b17236edc7b875048f915cedbf045ad9",
+      "role": "template"
+    }
+  ],
+  "_self_check": {
+    "verify_verdict": "PASS",
+    "checks_failed": [],
+    "checks_counts": {
+      "PASS": 19,
+      "FAIL": 0,
+      "SKIP": 0,
+      "UNVERIFIED": 0
+    },
+    "artifacts": [
+      "output/\\deck.pptx",
+      "output/\\render\\deck.pdf",
+      "output/\\evidence_map.json",
+      "output/\\plan.json",
+      "output/\\speaker-notes.md",
+      "output/\\verify_report.json",
+      "output/\\render_report.json"
+    ]
+  },
+  "_unmapped_contract_keys": [],
+  "_artifact_paths": {
+    "deck_pptx": "output/\\deck.pptx",
+    "deck_pdf": "output/\\render\\deck.pdf",
+    "slide_previews": [
+      "work/\\render\\slide-01.png",
+      "work/\\render\\slide-02.png",
+      "work/\\render\\slide-03.png",
+      "work/\\render\\slide-04.png",
+      "work/\\render\\slide-05.png",
+      "work/\\render\\slide-06.png",
+      "work/\\render\\slide-07.png",
+      "work/\\render\\slide-08.png"
+    ],
+    "plan": "output/\\plan.json",
+    "evidence_map": "output/\\evidence_map.json",
+    "speaker_notes": "output/\\speaker-notes.md",
+    "verify_report": "output/\\verify_report.json",
+    "render_report": "output/\\render_report.json",
+    "build_report": "output/\\build_report.json",
+    "material": "output/\\material.json",
+    "template": "input/\\materials\\template-organizer.pptx"
+  },
+  "_schema": "result/v1",
+  "slide_count": 8
+}

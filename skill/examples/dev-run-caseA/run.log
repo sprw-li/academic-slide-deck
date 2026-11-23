@@ -1,0 +1,18 @@
+# real stage/timing events from one development run (ts removed, 17 event line(s))
+{"event": "stage_start", "level": "info", "stage": "stage_ingest"}
+{"duration_ms": 3813, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_ingest"}
+{"event": "stage_start", "level": "info", "stage": "stage_plan"}
+{"duration_ms": 2422, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_plan"}
+{"event": "stage_start", "level": "info", "stage": "stage_build"}
+{"duration_ms": 7250, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_build"}
+{"event": "stage_start", "level": "info", "stage": "stage_render"}
+{"duration_ms": 23578, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_render"}
+{"event": "stage_start", "level": "info", "stage": "stage_evidence"}
+{"duration_ms": 734, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_evidence"}
+{"event": "stage_start", "level": "info", "stage": "stage_result"}
+{"duration_ms": 6936, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result"}
+{"event": "stage_start", "level": "info", "stage": "stage_verify"}
+{"duration_ms": 7235, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_verify"}
+{"event": "stage_start", "level": "info", "stage": "stage_result"}
+{"duration_ms": 6500, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "run_end", "exit_planned": null, "failed": [], "level": "info", "verify_verdict": "PASS"}

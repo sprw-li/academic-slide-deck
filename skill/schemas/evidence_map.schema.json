@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "evidence_map/v1",
+  "title": "evidence_map.json (evidence_map/v1)",
+  "description": "Page-level provenance: for every slide, the claims/figures/tables/numbers it shows and the source locator behind each one. match=exact means the slide text is the quoted source text; paraphrase is recorded as such rather than silently accepted.",
+  "type": "object",
+  "required": ["schema", "case_id", "pages", "coverage"],
+  "properties": {
+    "schema": {"const": "evidence_map/v1"},
+    "case_id": {"type": "string"},
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slide", "role"],
+        "properties": {
+          "slide": {"type": "integer"},
+          "role": {"type": "string"},
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["claim"],
+              "properties": {
+                "claim": {"type": "string"},
+                "locator": {"type": ["object", "null"]},
+                "match": {"enum": ["exact", "paraphrase", "none"]},
+                "verified": {"type": "boolean"}
+              }
+            }
+          },
+          "figures": {"type": "array", "items": {"type": "object"}},
+          "tables": {"type": "array", "items": {"type": "object"}},
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {"raw": {"type": "string"}, "locator": {"type": "object"}}
+            }
+          },
+          "unverified": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["slides_total", "slides_with_evidence"],
+      "properties": {
+        "slides_total": {"type": "integer"},
+        "slides_with_evidence": {"type": "integer"}
+      }
+    },
+    "uncertainty": {"type": "array", "items": {"type": "string"}}
+  }
+}

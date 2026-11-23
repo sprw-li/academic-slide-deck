@@ -1,0 +1,459 @@
+{
+  "schema": "selftest/v1",
+  "fixtures": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures",
+  "submission": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\submission",
+  "positives": [
+    {
+      "case": "caseA",
+      "case_json": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\caseA\\case.json",
+      "status": "PASS",
+      "problems": [],
+      "skips": [],
+      "steps": [
+        {
+          "name": "run.py",
+          "exit": 0,
+          "stdout_tail": "{\"out\": \"D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\caseA\\\\out\", \"stages\": {\"ingest\": 0, \"plan\": 0, \"build\": 0, \"render\": 0, \"evidence\": 0, \"verify",
+          "stderr_tail": "age_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] stage_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] stage_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] run_end"
+        },
+        {
+          "name": "verify_deck.py (independent re-run)",
+          "exit": 0,
+          "stdout_tail": "{\"verdict\": \"PASS\", \"counts\": {\"PASS\": 19, \"FAIL\": 0, \"SKIP\": 0, \"UNVERIFIED\": 0}, \"report\": \"D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\caseA\\\\out",
+          "stderr_tail": ""
+        }
+      ],
+      "version_records": [
+        "versions.json",
+        "change_records.json",
+        "diff-v1.md",
+        "rollback.md"
+      ],
+      "render_status": "ok",
+      "pdf": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\_selftest_tmp\\run-45448-20261123-141542\\caseA\\work\\render\\deck.pdf",
+      "pngs": 8,
+      "verdict": "PASS",
+      "counts": {
+        "PASS": 19,
+        "FAIL": 0,
+        "SKIP": 0,
+        "UNVERIFIED": 0
+      },
+      "failed_checks": [],
+      "gate_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "V09",
+        "V10",
+        "V11",
+        "V12",
+        "V13",
+        "V14",
+        "V15",
+        "V16",
+        "V17",
+        "V18",
+        "V19"
+      ],
+      "contract_keys": [
+        "case_id",
+        "change_records",
+        "deck_pdf",
+        "deck_pptx",
+        "page_evidence_map",
+        "plan",
+        "slide_previews",
+        "speaker_notes",
+        "status",
+        "uncertainty"
+      ],
+      "known_good": true,
+      "red_check_ids": []
+    },
+    {
+      "case": "caseB",
+      "case_json": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\caseB\\case.json",
+      "status": "PASS",
+      "problems": [],
+      "skips": [],
+      "steps": [
+        {
+          "name": "run.py",
+          "exit": 0,
+          "stdout_tail": "{\"out\": \"D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\caseB\\\\out\", \"stages\": {\"ingest\": 0, \"plan\": 0, \"build\": 0, \"render\": 0, \"evidence\": 0, \"verify",
+          "stderr_tail": "age_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] stage_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] stage_start \n[INFO] stage \n[INFO] stage_end \n[INFO] copy \n[INFO] run_end"
+        },
+        {
+          "name": "verify_deck.py (independent re-run)",
+          "exit": 0,
+          "stdout_tail": "{\"verdict\": \"PASS\", \"counts\": {\"PASS\": 19, \"FAIL\": 0, \"SKIP\": 0, \"UNVERIFIED\": 0}, \"report\": \"D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\caseB\\\\out",
+          "stderr_tail": ""
+        }
+      ],
+      "version_records": [
+        "versions.json",
+        "change_records.json",
+        "diff-v1.md",
+        "rollback.md"
+      ],
+      "render_status": "ok",
+      "pdf": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\_selftest_tmp\\run-45448-20261123-141542\\caseB\\work\\render\\deck.pdf",
+      "pngs": 12,
+      "verdict": "PASS",
+      "counts": {
+        "PASS": 19,
+        "FAIL": 0,
+        "SKIP": 0,
+        "UNVERIFIED": 0
+      },
+      "failed_checks": [],
+      "gate_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "V09",
+        "V10",
+        "V11",
+        "V12",
+        "V13",
+        "V14",
+        "V15",
+        "V16",
+        "V17",
+        "V18",
+        "V19"
+      ],
+      "contract_keys": [
+        "case_id",
+        "evidence",
+        "notes",
+        "outline",
+        "pdf",
+        "pptx",
+        "previews",
+        "status",
+        "uncertainty"
+      ],
+      "known_good": true,
+      "red_check_ids": []
+    }
+  ],
+  "negatives": [
+    {
+      "id": "N01",
+      "name": "fabricated number not in the source",
+      "expected_check_ids": [
+        "V04"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V04"
+      ],
+      "detail": "added '1777.7 %' to slide 2",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V04"
+      ]
+    },
+    {
+      "id": "N02",
+      "name": "missing / too-short speaker notes",
+      "expected_check_ids": [
+        "V03"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V03"
+      ],
+      "detail": "deck notes slide 2 -> 'too short' (<40 chars); plan slide 2 also shortened",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V03"
+      ]
+    },
+    {
+      "id": "N03",
+      "name": "wrong slide count vs the case constraint",
+      "expected_check_ids": [
+        "V01"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V01"
+      ],
+      "detail": "deck slides 8 -> 7 (case requires 8)",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V01"
+      ]
+    },
+    {
+      "id": "N04",
+      "name": "modified theme (fontScheme)",
+      "expected_check_ids": [
+        "V08"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V08",
+        "V12"
+      ],
+      "detail": "theme1.xml major latin typeface -> 'Tampered Serif'",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V08"
+      ]
+    },
+    {
+      "id": "N05",
+      "name": "modified master/layout",
+      "expected_check_ids": [
+        "V07"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V07"
+      ],
+      "detail": "slideMaster1.xml first cNvPr name prefixed 'tampered-'",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V07"
+      ]
+    },
+    {
+      "id": "N06",
+      "name": "placeholder / invented figure",
+      "expected_check_ids": [
+        "V06"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V06"
+      ],
+      "detail": "embedded an extra picture on slide 3 and declared mode='placeholder' / source_ref='fig99'",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V06"
+      ]
+    },
+    {
+      "id": "N07",
+      "name": "missing output_contract key in result.json",
+      "expected_check_ids": [
+        "V13"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V13"
+      ],
+      "detail": "removed output_contract key 'plan' from result.json",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V13"
+      ]
+    },
+    {
+      "id": "N08",
+      "name": "text overflow on a slide",
+      "expected_check_ids": [
+        "V10"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V10"
+      ],
+      "detail": "slide 2 text frame set to 4020 chars, auto_size set to NONE, shrink-to-fit stripped from 8 slide part(s)",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V10"
+      ]
+    },
+    {
+      "id": "N09",
+      "name": "duplicate slide content",
+      "expected_check_ids": [
+        "V16"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V16"
+      ],
+      "detail": "slide 3 now repeats slide 2 (title,claim,bullets,notes); deck mirrored (2 shape(s))",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V16"
+      ]
+    },
+    {
+      "id": "N10",
+      "name": "brief metadata leaked into a bullet",
+      "expected_check_ids": [
+        "V17"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V17"
+      ],
+      "detail": "leaked brief metadata onto slide 2: Audience: 课题组组会 (supervisor + peer graduate students) | Duration: 10 minutes | Template: template-organizer.pptx",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V17"
+      ]
+    },
+    {
+      "id": "N11",
+      "name": "build_report describes a foreign deck",
+      "expected_check_ids": [
+        "V18"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V18"
+      ],
+      "detail": "build_report.pptx 'D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\neg-N11\\\\deck.pptx' -> 'D:\\\\Borium_Contest\\\\ARMI2611000074v1\\\\work\\\\fixtures\\\\_selftest_tmp\\\\run-45448-20261123-141542\\\\elsewhere\\\\deck.pptx'",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V18"
+      ]
+    },
+    {
+      "id": "N12",
+      "name": "gutted source / empty text layer",
+      "expected_check_ids": [
+        "V19"
+      ],
+      "status": "DETECTED",
+      "observed": [
+        "V04",
+        "V05",
+        "V19"
+      ],
+      "detail": "material.json gutted: 13880 text chars -> 0, emptied {'figures': 4, 'tables': 2, 'numbers': 370, 'claims': 39}",
+      "already_failing_before_injection": [],
+      "paths_rewritten_in_files": 4,
+      "control_exit": 0,
+      "control_failing_ids": [],
+      "verify_exit": 1,
+      "verdict": "FAIL",
+      "detected_by": [
+        "V19"
+      ]
+    }
+  ],
+  "skips": [],
+  "problems": [],
+  "status": "PASS",
+  "scratch_root": "D:\\Borium_Contest\\ARMI2611000074v1\\work\\fixtures\\_selftest_tmp\\run-45448-20261123-141542",
+  "emitted_gate_ids": [
+    "V01",
+    "V02",
+    "V03",
+    "V04",
+    "V05",
+    "V06",
+    "V07",
+    "V08",
+    "V09",
+    "V10",
+    "V11",
+    "V12",
+    "V13",
+    "V14",
+    "V15",
+    "V16",
+    "V17",
+    "V18",
+    "V19"
+  ],
+  "known_good_cases": [
+    "caseA",
+    "caseB"
+  ],
+  "negative_baseline_clean": true,
+  "negative_baseline_failing_ids": [],
+  "negative_baseline_case": "caseA",
+  "negative_staged_from": "out",
+  "negative_staged_files": 31,
+  "counts": {
+    "positives_total": 2,
+    "positives_passed": 2,
+    "positives_exercised": 0,
+    "negatives_total": 12,
+    "negatives_detected": 12,
+    "negatives_not_detected": 0,
+    "negatives_mutation_failed": 0,
+    "negatives_wrong_check": 0,
+    "negatives_preexisting": 0,
+    "negatives_gate_absent_skipped": 0,
+    "negatives_harness_error": 0,
+    "skipped_render_assertions": 0
+  },
+  "harness_ok": true,
+  "success_requires": "every negative DETECTED by its expected gate id, with negatives_mutation_failed == 0 and negatives_harness_error == 0; positives green for every known-good case"
+}

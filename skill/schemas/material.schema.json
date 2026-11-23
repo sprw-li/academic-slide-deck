@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "material/v1",
+  "title": "material.json (material/v1)",
+  "description": "Extraction of the case's real sources by ingest.py. Paths are relative to the work directory. HARD RULE: every figure, table, number and claim carries a locator whose quote is verbatim source text; anything without one is dropped and recorded in warnings (never fabricated).",
+  "type": "object",
+  "required": ["schema", "case_id", "sources", "figures", "tables", "numbers", "claims", "warnings"],
+  "properties": {
+    "schema": {"const": "material/v1"},
+    "case_id": {"type": "string"},
+    "generated": {"type": "string"},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "path", "sha256", "pages", "sections"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"enum": ["pdf", "docx", "md", "txt", "html", "other"]},
+          "role": {"enum": ["material", "task_card"], "description": "task_card = the platform's instruction card: ingested for constraints, never used as research content"},
+          "path": {"type": "string", "description": "relative to the work directory, POSIX separators"},
+          "sha256": {"type": "string"},
+          "bytes": {"type": "integer"},
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["n", "text"],
+              "properties": {"n": {"type": "integer"}, "text": {"type": "string"}}
+            }
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title", "page", "char_start", "char_end"],
+              "properties": {
+                "id": {"type": "string"}, "title": {"type": "string"},
+                "page": {"type": "integer"},
+                "char_start": {"type": "integer"}, "char_end": {"type": "integer"}
+              }
+            }
+          },
+          "text": {"type": "string", "description": "pages joined with newlines (what locators are checked against)"},
+          "warnings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "locator": {
+      "type": "object",
+      "description": "verbatim provenance of one item",
+      "required": ["source", "page", "quote"],
+      "properties": {
+        "source": {"type": "string"}, "page": {"type": "integer"},
+        "quote": {"type": "string"}
+      }
+    },
+    "figures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "page", "caption", "locator", "kind"],
+        "properties": {
+          "id": {"type": "string"}, "label": {"type": "string"},
+          "page": {"type": "integer"},
+          "bbox": {"type": ["array", "null"], "items": {"type": "number"},
+                   "description": "[x0, top, x1, bottom] in PDF points, or null when no region could be located"},
+          "caption": {"type": "string"},
+          "locator": {"$ref": "#/properties/locator"},
+          "kind": {"enum": ["raster", "vector", "unknown"]},
+          "image": {
+            "type": "object",
+            "description": "present only when a real image was captured; its absence means the deck builder emits nothing for this figure",
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string"}, "sha256": {"type": "string"},
+              "backend": {"type": "string", "description": "pypdfium2 | fitz | pdfplumber.to_image | imagemagick | ghostscript | raster-hook | docx-embedded"}
+            }
+          }
+        }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "page", "caption", "locator", "n_rows", "n_cols"],
+        "properties": {
+          "id": {"type": "string"}, "label": {"type": "string"},
+          "page": {"type": "integer"}, "caption": {"type": "string"},
+          "locator": {"$ref": "#/properties/locator"},
+          "cells": {"type": ["array", "null"], "items": {"type": "array", "items": {"type": "string"}}},
+          "n_rows": {"type": "integer"}, "n_cols": {"type": "integer"}
+        }
+      }
+    },
+    "numbers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["value", "raw", "unit", "context", "kind", "locator"],
+        "properties": {
+          "id": {"type": "string"},
+          "value": {"type": ["number", "null"]},
+          "raw": {"type": "string", "description": "exactly as printed in the source; never rounded"},
+          "unit": {"type": "string"}, "context": {"type": "string"},
+          "kind": {"enum": ["result", "parameter", "other"]},
+          "locator": {"$ref": "#/properties/locator"}
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "locator"],
+        "properties": {
+          "id": {"type": "string"},
+          "text": {"type": "string", "description": "a whole sentence; fragments are never emitted"},
+          "locator": {"$ref": "#/properties/locator"}
+        }
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "stats": {"type": "object"}
+  }
+}

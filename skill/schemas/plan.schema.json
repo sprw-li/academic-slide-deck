@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "plan/v1",
+  "title": "plan.json (plan/v1)",
+  "description": "Page-level plan by plan.py. Constraints are metadata: they are recorded here and never emitted as slide content. Bullets are whole verbatim source sentences; titles are claims, never truncated sentence prefixes.",
+  "type": "object",
+  "required": ["schema", "case_id", "constraints", "narrative", "slides", "excluded"],
+  "properties": {
+    "schema": {"const": "plan/v1"},
+    "case_id": {"type": "string"},
+    "generated": {"type": "string"},
+    "constraints": {
+      "type": "object",
+      "required": ["slide_count", "slide_count_range", "language", "template_path", "template_layouts"],
+      "properties": {
+        "audience": {"type": ["string", "null"]},
+        "duration_min": {"type": ["number", "null"]},
+        "slide_count": {"type": ["integer", "null"]},
+        "slide_count_range": {"type": ["array", "null"], "items": {"type": "integer"}},
+        "language": {"type": "string"},
+        "template_path": {"type": ["string", "null"]},
+        "starting_deck_path": {"type": ["string", "null"]},
+        "template_layouts": {"type": "array", "items": {"type": "string"},
+                             "description": "layout names that actually exist in the case template"},
+        "layout_hints_available": {"type": "object"},
+        "_sources": {"type": "object",
+                     "description": "per constraint field: which document supplied it (case.json | task.md)"},
+        "_task_card": {"type": ["string", "null"]}
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "required": ["arc", "main_thread"],
+      "properties": {
+        "arc": {"type": "string"},
+        "main_thread": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "slides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "role", "title", "claim", "bullets", "evidence", "numbers_used", "notes", "layout_hint"],
+        "properties": {
+          "index": {"type": "integer", "minimum": 1},
+          "role": {"enum": ["title", "outline", "problem", "method", "result", "figure", "table", "limitation", "conclusion", "ack", "backup"]},
+          "title": {"type": "string", "maxLength": 200, "description": "a claim or section label; never a mid-value sentence prefix"},
+          "claim": {"type": "string", "minLength": 1},
+          "bullets": {
+            "type": "array", "maxItems": 5,
+            "items": {"type": "string", "maxLength": 120,
+                      "description": "a whole source sentence ending in terminal punctuation"}
+          },
+          "figure_ref": {"type": ["string", "null"]},
+          "table_ref": {"type": ["string", "null"]},
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {"enum": ["figure", "table", "section", "number", "claim"]},
+                "ref": {"type": ["string", "null"]},
+                "locator": {"type": "object"},
+                "note": {"type": "string"}
+              }
+            }
+          },
+          "numbers_used": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["raw", "locator"],
+              "properties": {
+                "value": {"type": ["number", "null"]},
+                "raw": {"type": "string"},
+                "unit": {"type": "string"},
+                "locator": {"type": "object"}
+              }
+            }
+          },
+          "notes": {"type": "string", "minLength": 40},
+          "layout_hint": {"enum": ["title", "title-content", "two-content", "picture-caption", "section"]},
+          "layout_name": {"type": ["string", "null"],
+                          "description": "the real layout in the case template that satisfies layout_hint"}
+        }
+      }
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["item", "reason"],
+        "properties": {"item": {"type": "string"}, "reason": {"type": "string"}}
+      }
+    },
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "stats": {"type": "object"}
+  }
+}
