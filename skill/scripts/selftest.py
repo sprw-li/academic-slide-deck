@@ -857,8 +857,28 @@ def check_positive(case_path: Path, work: Path, out: Path, verify: Path, timeout
 # --------------------------------------------------------------------------- #
 # negative checks
 # --------------------------------------------------------------------------- #
+def run_verify_with_retry(verify, case_path, work_dir, timeout):
+    """Run ``verify_deck.py`` with a bounded retry; report a timeout as its own outcome.
+
+    A killed verifier means "we do not know", which is NOT the same as "the wrong gate fired".
+    Normally this call takes ~2 s, so a timeout is a transient stall (IO/AV contention) far
+    more often than a hang; one bounded retry clears the transient case while a real hang
+    still surfaces as ``timed_out``. Both the attempt count and whether the first attempt
+    timed out are recorded so the retry is visible, never silent.
+    """
+    attempts = []
+    for attempt in range(1, 3):
+        rc, so, se = run_cli([verify, "--case", case_path, "--work", work_dir,
+                              "--out", work_dir], cwd=SUBMISSION, timeout=timeout)
+        attempts.append({"attempt": attempt, "exit": rc})
+        if rc != 124:
+            return rc, so, se, attempts, False
+    return 124, "", "timeout after %ss (2 attempts)" % timeout, attempts, True
+
+
 def run_negative(nid, name, expected_ids, mutate, base_out, chosen_work, case_path,
-                 verify, tmp_root, timeout, good_failing_ids=(), emitted_ids=()):
+                 verify, tmp_root, timeout, good_failing_ids=(), emitted_ids=(),
+                 verify_timeout=None):
     """Stage a copy of a real run's output dir, inject one defect, require detection.
 
     ``base_out`` is the flat output directory of a real ``run.py`` run -- it already holds
@@ -867,6 +887,8 @@ def run_negative(nid, name, expected_ids, mutate, base_out, chosen_work, case_pa
     gets its own copy, mutates *that* copy, and is verified with ``--work <copy> --out <copy>``
     so V13 (which prefers ``--out``) and V15 (which scans ``--out``) see the staged files.
     """
+    if verify_timeout is None:
+        verify_timeout = timeout
     res = {"id": nid, "name": name, "expected_check_ids": expected_ids,
            "status": "NOT_DETECTED", "observed": [], "detail": "",
            "already_failing_before_injection": sorted(set(expected_ids) & set(good_failing_ids))}
@@ -929,18 +951,35 @@ def run_negative(nid, name, expected_ids, mutate, base_out, chosen_work, case_pa
         res["status"] = "HARNESS_ERROR"
         res["detail"] = "could not stage the control copy: %s" % exc
         return res
-    c_rc, c_so, c_se = run_cli([verify, "--case", case_path, "--work", control,
-                                "--out", control], cwd=SUBMISSION, timeout=timeout)
+    c_rc, c_so, c_se, c_attempts, c_timed_out = run_verify_with_retry(
+        verify, case_path, control, verify_timeout)
     control_json = load_json(control / "verify_report.json", {}) or {}
     control_failing = [c.get("id") for c in (control_json.get("checks") or [])
                        if c.get("status") in ("FAIL", "UNVERIFIED")]
     res["control_exit"] = c_rc
+    res["control_attempts"] = c_attempts
     res["control_failing_ids"] = control_failing
     rmtree(control)
+    if c_timed_out:
+        # Without a control result we cannot prove the injection caused anything, so this is
+        # "unknown" -- not a wrong gate and not a detection.
+        res["status"] = "VERIFIER_TIMEOUT"
+        res["detail"] = ("the un-injected control verify did not answer within %ss (2 "
+                         "attempts), so the PASS->FAIL transition cannot be proven"
+                         % verify_timeout)
+        return res
 
-    rc, so, se = run_cli([verify, "--case", case_path, "--work", work, "--out", work],
-                         cwd=SUBMISSION, timeout=timeout)
+    rc, so, se, attempts, timed_out = run_verify_with_retry(
+        verify, case_path, work, verify_timeout)
     res["verify_exit"] = rc
+    res["verify_attempts"] = attempts
+    res["verify_timed_out_once"] = bool(timed_out)
+    if timed_out:
+        res["status"] = "VERIFIER_TIMEOUT"
+        res["detail"] = ("verify_deck.py did not answer within %ss on the mutated deck "
+                         "(2 attempts, exit 124); the defect is neither confirmed nor "
+                         "refuted -- this is 'unknown', NOT a wrong-check" % verify_timeout)
+        return res
     report = load_json(report_path, {}) or {}
     observed = [c.get("id") for c in (report.get("checks") or [])
                 if c.get("status") in ("FAIL", "UNVERIFIED")]
@@ -982,7 +1021,11 @@ def main(argv=None) -> int:
                     help="only test this case directory name (repeatable); negatives run on "
                          "the first one")
     ap.add_argument("--json", default=None, help="write the machine-readable summary here")
-    ap.add_argument("--timeout", type=int, default=900, help="seconds per CLI call")
+    ap.add_argument("--timeout", type=int, default=900, help="seconds per pipeline-stage CLI call")
+    ap.add_argument("--verify-timeout", type=int, default=600,
+                    help="seconds per verify_deck.py call inside a negative (separate from "
+                         "--timeout; one bounded retry is made, and a timeout is reported as "
+                         "its own VERIFIER_TIMEOUT category rather than a wrong-check)")
     ap.add_argument("--keep", action="store_true", help="keep the scratch tree")
     ap.add_argument("--known-good", action="append", default=None,
                     help="case dir name asserted fully green end-to-end (repeatable; default: "
@@ -1155,7 +1198,8 @@ def main(argv=None) -> int:
                 res = run_negative(nid, name, expected, mutate, base_out, work, case_path,
                                    verify, tmp_root, args.timeout,
                                    good_failing_ids=good_failing,
-                                   emitted_ids=emitted_ids)
+                                   emitted_ids=emitted_ids,
+                                   verify_timeout=args.verify_timeout)
             except Exception as exc:  # noqa: BLE001
                 res = {"id": nid, "name": name, "expected_check_ids": expected,
                        "status": "HARNESS_ERROR", "observed": [],
@@ -1168,7 +1212,7 @@ def main(argv=None) -> int:
     pos_ok = all(p["status"] != "FAIL" for p in summary["positives"]) and any(
         p["status"] == "PASS" for p in summary["positives"])
     blocking_statuses = {"NOT_DETECTED", "WRONG_CHECK", "MUTATION_FAILED", "PREEXISTING",
-                         "HARNESS_ERROR"}
+                         "HARNESS_ERROR", "VERIFIER_TIMEOUT"}
     neg_ok = (args.skip_negatives or
               all(n["status"] not in blocking_statuses for n in summary["negatives"]))
     summary["status"] = "PASS" if (pos_ok and neg_ok) else "FAIL"
@@ -1186,6 +1230,8 @@ def main(argv=None) -> int:
                                          if n["status"] == "MUTATION_FAILED"),
         "negatives_wrong_check": sum(1 for n in summary["negatives"]
                                      if n["status"] == "WRONG_CHECK"),
+        "negatives_verifier_timeout": sum(1 for n in summary["negatives"]
+                                          if n["status"] == "VERIFIER_TIMEOUT"),
         "negatives_preexisting": sum(1 for n in summary["negatives"]
                                      if n["status"] == "PREEXISTING"),
         "negatives_gate_absent_skipped": sum(1 for n in summary["negatives"]
@@ -1210,17 +1256,26 @@ def main(argv=None) -> int:
     log("-" * 92)
     log("counts: %s" % json.dumps(summary["counts"], ensure_ascii=False))
     harness_ok = (summary["counts"]["negatives_mutation_failed"] == 0
-                  and summary["counts"]["negatives_harness_error"] == 0)
+                  and summary["counts"]["negatives_harness_error"] == 0
+                  and summary["counts"]["negatives_verifier_timeout"] == 0)
     summary["harness_ok"] = harness_ok
     summary["success_requires"] = (
-        "every negative DETECTED by its expected gate id, with negatives_mutation_failed == 0 "
-        "and negatives_harness_error == 0; positives green for every known-good case")
+        "every negative DETECTED by its expected gate id, with negatives_mutation_failed == 0, "
+        "negatives_harness_error == 0 and negatives_verifier_timeout == 0; positives green for "
+        "every known-good case")
+    if summary["counts"]["negatives_verifier_timeout"]:
+        log("VERIFIER TIMEOUT: %d negative(s) could not be classified because verify_deck.py "
+            "did not answer in time (--verify-timeout %ss, one retry). That is 'unknown', not "
+            "a wrong-check and not a detection; re-run when the machine is idle, or raise "
+            "--verify-timeout."
+            % (summary["counts"]["negatives_verifier_timeout"], args.verify_timeout))
     if not harness_ok:
-        log("HARNESS ERROR: %d negative(s) MUTATION_FAILED, %d HARNESS_ERROR. These are "
-            "defects in THIS harness, not successes -- read 'negatives_not_detected: %d' only "
-            "together with the mutation/harness counts, never on its own."
+        log("HARNESS ERROR: %d negative(s) MUTATION_FAILED, %d HARNESS_ERROR, %d "
+            "VERIFIER_TIMEOUT. These are defects in THIS harness, not successes -- read "
+            "'negatives_not_detected: %d' only together with these counts, never on its own."
             % (summary["counts"]["negatives_mutation_failed"],
                summary["counts"]["negatives_harness_error"],
+               summary["counts"]["negatives_verifier_timeout"],
                summary["counts"]["negatives_not_detected"]))
     for skip in summary["skips"]:
         log("SKIP  %s: %s -- %s" % (skip["case"], skip["assertion"], skip["reason"][:160]))
