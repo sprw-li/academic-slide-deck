@@ -68,7 +68,7 @@
       "role": "problem",
       "claims": [
         {
-          "claim": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+          "claim": "Five consecutive reuse cycles retained 88.1 % of the initial activity",
           "locator": {
             "page": 1,
             "quote": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
@@ -112,6 +112,16 @@
       "tables": [],
       "numbers": [
         {
+          "raw": "88.1",
+          "locator": {
+            "page": 1,
+            "quote": "Removal decayed from 92.4 % in cycle 1 to 81.4 % in cycle 5, so the material retained 88.1 % of its initial activity.",
+            "source": "src1"
+          },
+          "match": "exact",
+          "verified": true
+        },
+        {
           "raw": "0.0312",
           "locator": {
             "page": 1,
@@ -146,16 +156,6 @@
           "locator": {
             "page": 1,
             "quote": "The fit quality was R2 = 0.994 over seven points.",
-            "source": "src1"
-          },
-          "match": "exact",
-          "verified": true
-        },
-        {
-          "raw": "88.1",
-          "locator": {
-            "page": 1,
-            "quote": "Removal decayed from 92.4 % in cycle 1 to 81.4 % in cycle 5, so the material retained 88.1 % of its initial activity.",
             "source": "src1"
           },
           "match": "exact",
@@ -380,7 +380,7 @@
       "role": "result",
       "claims": [
         {
-          "claim": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+          "claim": "The nitrogen content from CHN analysis was 3.4 at.%",
           "locator": {
             "page": 1,
             "quote": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
@@ -424,20 +424,20 @@
       "tables": [],
       "numbers": [
         {
-          "raw": "0.5",
+          "raw": "3.4",
           "locator": {
             "page": 1,
-            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
             "source": "src1"
           },
           "match": "exact",
           "verified": true
         },
         {
-          "raw": "3.4",
+          "raw": "0.5",
           "locator": {
             "page": 1,
-            "quote": "The nitrogen content from CHN analysis was 3.4 at.%.",
+            "quote": "no rutile or TiN reflections appeared at the 0.5 % detection limit.",
             "source": "src1"
           },
           "match": "exact",

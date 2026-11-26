@@ -1,18 +1,35 @@
-# real stage/timing events from one development run (ts removed, 17 event line(s))
-{"event": "stage_start", "level": "info", "stage": "stage_ingest"}
-{"duration_ms": 3813, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_ingest"}
-{"event": "stage_start", "level": "info", "stage": "stage_plan"}
-{"duration_ms": 2422, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_plan"}
-{"event": "stage_start", "level": "info", "stage": "stage_build"}
-{"duration_ms": 7250, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_build"}
-{"event": "stage_start", "level": "info", "stage": "stage_render"}
-{"duration_ms": 23578, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_render"}
-{"event": "stage_start", "level": "info", "stage": "stage_evidence"}
-{"duration_ms": 734, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_evidence"}
-{"event": "stage_start", "level": "info", "stage": "stage_result"}
-{"duration_ms": 6936, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result"}
-{"event": "stage_start", "level": "info", "stage": "stage_verify"}
-{"duration_ms": 7235, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_verify"}
-{"event": "stage_start", "level": "info", "stage": "stage_result"}
-{"duration_ms": 6500, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result"}
-{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "run_end", "exit_planned": null, "failed": [], "level": "info", "verify_verdict": "PASS"}
+# run.log 2026-11-26T14:53:17Z
+{"case": "case.json", "event": "run_start", "level": "info", "out": "<redacted-path>", "skip_render": false, "stages": ["ingest", "plan", "build", "render", "evidence", "verify", "result"], "ts": "2026-11-26T14:53:17Z", "work": "<redacted-path>"}
+{"event": "stage_start", "level": "info", "stage": "stage_ingest", "ts": "2026-11-26T14:53:17Z"}
+{"command": "python.exe ingest.py --case case.json --work work", "description": "extract material.json from the real sources", "duration_ms": 2391, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "ingest", "stdout_tail": "{\"material\": \"<redacted-path>", \"stats\": {\"sources\": 3, \"pages\": 7, \"figures\": 4, \"tables\": 2, \"numbers\": 370, \"claims\": 39, \"warnings\": 9}, \"warnings\": 9}", "ts": "2026-11-26T14:53:19Z"}
+{"duration_ms": 2391, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_ingest", "ts": "2026-11-26T14:53:19Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_plan", "ts": "2026-11-26T14:53:19Z"}
+{"command": "python.exe plan.py --case case.json --work work", "description": "page roles, claims, bullets, evidence and layout hints", "duration_ms": 1047, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "plan", "stdout_tail": "{\"plan\": \"<redacted-path>", \"stats\": {\"slides\": 8, \"bullets\": 12, \"figures_used\": 1, \"tables_used\": 1, \"numbers_used\": 67, \"excluded\": 37, \"warnings\": 1}}", "ts": "2026-11-26T14:53:20Z"}
+{"duration_ms": 1047, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_plan", "ts": "2026-11-26T14:53:20Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_build", "ts": "2026-11-26T14:53:20Z"}
+{"command": "python.exe build_deck.py --case case.json --work work", "description": "editable deck.pptx from the case template", "duration_ms": 2921, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "build", "stdout_tail": "{\"deck\": \"<redacted-path>", \"report\": \"<redacted-path>", \"stats\": {\"slides\": 8, \"images\": 2, \"source_crops\": 1, \"redraws\": 1, \"high_overflow\": 2, \"warnings\": 5}, \"invariants\": {\"master_unchanged\": true, \"theme_unchanged\": true, \"footer_preserved\": true}}", "ts": "2026-11-26T14:53:23Z"}
+{"duration_ms": 2921, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_build", "ts": "2026-11-26T14:53:23Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_render", "ts": "2026-11-26T14:53:23Z"}
+{"command": "python.exe render.py --case case.json --work work", "description": "PDF + PNG previews via LibreOffice Kit", "duration_ms": 8218, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "render", "stdout_tail": "{\"status\": \"ok\", \"renderer\": \"libreoffice-kit\", \"strategy\": \"bounded-search\", \"pdf\": \"<redacted-path>", \"pngs\": 8, \"report\": \"<redacted-path>"}", "ts": "2026-11-26T14:53:31Z"}
+{"duration_ms": 8218, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_render", "ts": "2026-11-26T14:53:31Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:31Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_evidence", "ts": "2026-11-26T14:53:31Z"}
+{"command": "python.exe evidence.py --case case.json --work work", "description": "page-level evidence map", "duration_ms": 468, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "evidence", "stdout_tail": "{\"schema\": \"evidence_map/v1\", \"pages\": 8, \"coverage\": {\"slides_total\": 8, \"slides_with_evidence\": 8, \"slides_with_verified_evidence\": 8}, \"out\": \"<redacted-path>"}", "ts": "2026-11-26T14:53:32Z"}
+{"duration_ms": 484, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_evidence", "ts": "2026-11-26T14:53:32Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:32Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:32Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:32Z"}
+{"chars": 8564, "event": "transcript", "level": "info", "path": "deck-transcript.md", "slides": 8, "ts": "2026-11-26T14:53:32Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_result", "ts": "2026-11-26T14:53:32Z"}
+{"command": "python.exe result_contract.py --case case.json --work work --out out", "description": "result.json", "duration_ms": 1218, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "result", "stdout_tail": "{\"status\": \"ok\", \"case_id\": \"SYNTHETIC-EXP-001\", \"keys_filled\": 12, \"unmapped\": [], \"uncertainty_n\": 15, \"out\": \"<redacted-path>"}", "ts": "2026-11-26T14:53:33Z"}
+{"duration_ms": 1218, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result", "ts": "2026-11-26T14:53:33Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:33Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_verify", "ts": "2026-11-26T14:53:33Z"}
+{"command": "python.exe verify_deck.py --case case.json --work work --out out", "description": "V01-V15 self-check gate", "duration_ms": 2389, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "verify", "stdout_tail": "{\"verdict\": \"PASS\", \"counts\": {\"PASS\": 20, \"FAIL\": 0, \"SKIP\": 0, \"UNVERIFIED\": 0}, \"report\": \"<redacted-path>", \"notable\": []}", "ts": "2026-11-26T14:53:36Z"}
+{"duration_ms": 2389, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_verify", "ts": "2026-11-26T14:53:36Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "verify_report.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:36Z"}
+{"event": "stage_start", "level": "info", "stage": "stage_result", "ts": "2026-11-26T14:53:36Z"}
+{"command": "python.exe result_contract.py --case case.json --work work --out out", "description": "result.json", "duration_ms": 1125, "event": "stage", "exit_code": 0, "level": "info", "ok": true, "stage": "result", "stdout_tail": "{\"status\": \"ok\", \"case_id\": \"SYNTHETIC-EXP-001\", \"keys_filled\": 12, \"unmapped\": [], \"uncertainty_n\": 14, \"out\": \"<redacted-path>"}", "ts": "2026-11-26T14:53:37Z"}
+{"duration_ms": 1125, "error": null, "event": "stage_end", "level": "info", "ok": true, "stage": "stage_result", "ts": "2026-11-26T14:53:37Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "verify_report.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "copy", "level": "info", "out": "<redacted-path>", "ts": "2026-11-26T14:53:37Z"}
+{"copied": ["deck.pptx", "material.json", "plan.json", "build_report.json", "render_report.json", "evidence_map.json", "render/ (9 files)", "figures/ (4 files)", "derived/ (1 files)"], "event": "run_end", "exit_planned": null, "failed": [], "level": "info", "ts": "2026-11-26T14:53:37Z", "verify_verdict": "PASS"}

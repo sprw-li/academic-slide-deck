@@ -17,11 +17,10 @@ scores the Skill itself on its own cases.
 | `dev-run-caseA/result.json` | the **real** returned document: every declared `output_contract` key plus `case_id`, `status`, `sources`, `uncertainty`, `change_records`, `_self_check` |
 | `dev-run-caseA/plan.json` | real page-level plan (role, claim, bullets, evidence locators, speaker notes) |
 | `dev-run-caseA/evidence_map.json` | real slide → figure/table/section/number map with verbatim source locators |
-| `dev-run-caseA/verify_report.json` | real gate report: V01–V19, zero FAIL, zero UNVERIFIED |
+| `dev-run-caseA/verify_report.json` | real gate report: V01–V20, zero FAIL, zero UNVERIFIED |
 | `dev-run-caseA/build_report.excerpt.json` | key fields of the real build report (template invariants, fonts, per-slide layout/overflow/notes) |
 | `dev-run-caseA/render_report.excerpt.json` | key fields of the real render report (renderer, PDF, per-slide preview geometry) |
 | `dev-run-caseA/run.log` | real stage/timing events of that run |
-| `dev-run-caseA/contact-sheet.png` | thumbnail contact sheet of the 8 rendered slides — the quickest way to see the deck |
 
 ## Invocation
 
@@ -47,9 +46,14 @@ Individual stages run standalone and each writes one JSON artifact (`ingest.py`,
    were rewritten to portable tokens (`work/…`, `output/…`, `input/…`). The values, ordering
    and structure are the run's own output, unmodified; only path strings changed, and every
    JSON was re-parsed after rewriting.
-2. **`contact-sheet.png` is a downscaled thumbnail grid**, not the deliverable previews. The
-   real run produced one full-resolution `slide-NN.png` per slide and a `deck.pdf`; the PNGs
-   are downsampled here purely to respect the submission size budget.
+2. **No rendered images are shipped in this directory — deliberately.** Skill resources are
+   restricted to **UTF-8 text files** (≤50 files, ≤500 KB each, ≤2 MB total, no symlinks), so a
+   `.png` here is an *unsupported resource type* and causes the whole submission to be rejected
+   by the platform's format pre-check before it is ever evaluated. The real run still produces
+   `slide-NN.png` per slide plus `deck.pdf` **into its own output directory at run time**; those
+   are deliverables of a run, not resources of the Skill. What is shipped instead is text: this
+   directory plus `deck-transcript.md`, which the pipeline emits alongside the deck so the page
+   content is inspectable without opening the binary files.
 
 ## Reproducing this example
 

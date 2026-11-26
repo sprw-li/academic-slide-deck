@@ -166,10 +166,13 @@ RUBRIC = [
         "artifacts": [],
         "files": ["examples/README.md", "examples/dev-run-caseA/case.json",
                   "examples/dev-run-caseA/result.json",
-                  "examples/dev-run-caseA/contact-sheet.png"],
+                  "examples/dev-run-caseA/deck-transcript.md"],
         "scripts": [],
         "note": "One input case.json, the exact invocation and an 示意 output explicitly "
-                "marked as an example, not an official case result.",
+                "marked as an example, not an official case result. Skill resources must be "
+                "UTF-8 TEXT, so no rendered image is shipped here; the run's own previews "
+                "(slide-NN.png / deck.pdf) are produced into the output directory at run time "
+                "and deck-transcript.md is the shippable text view of the pages.",
     },
     {
         "line": 71,

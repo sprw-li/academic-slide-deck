@@ -1,6 +1,8 @@
 {
-  "_excerpt": "key fields of the real build_report.json (slide image/provenance detail trimmed); paths sanitized for shipping",
   "schema": "build_report/v1",
+  "engine": "python-pptx",
+  "pptx": "<redacted-path>",
+  "sha256": "71ce570f322fdb4e29a0aef4bc2c276eff3b404248c908ba2cd92a18f86fa15d",
   "template": {
     "layout_names": [
       "Title Slide",
@@ -17,8 +19,8 @@
     ],
     "layouts": 11,
     "masters": 1,
-    "path": "input/\\materials\\template-organizer.pptx",
-    "path_rel": "../caseA/materials/template-organizer.pptx",
+    "path": "<redacted-path>",
+    "path_rel": "../../../fixtures/caseA/materials/template-organizer.pptx",
     "sha256": "9bb7eb08616f7a78f45b157d4e0ca114b17236edc7b875048f915cedbf045ad9",
     "theme_fonts": {
       "major_ea": "",
@@ -45,69 +47,207 @@
     "protected_parts_restored": 25,
     "theme_unchanged": true
   },
-  "fonts_used": [
-    "Liberation Serif"
-  ],
-  "warnings": [
-    "slide 1: Title 1 text was fitted from 44pt to 29pt so it stays inside its placeholder",
-    "slide 1: Subtitle 2 text was fitted from 32pt to 26pt so it stays inside its placeholder",
-    "slide 6: Title 1 text was fitted from 44pt to 33pt so it stays inside its placeholder"
-  ],
   "slides": [
     {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
       "index": 1,
       "layout": "Title Slide",
+      "notes_chars": 308,
+      "overflow_detail": [
+        {
+          "available_pt": 115.8,
+          "chars_per_line": 27,
+          "est_lines": 2,
+          "font_pt": 43.0,
+          "needed_pt": 116.1,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 138.0,
+          "chars_per_line": 37,
+          "est_lines": 4,
+          "font_pt": 26.0,
+          "needed_pt": 140.4,
+          "shape": "Subtitle 2"
+        }
+      ],
+      "overflow_risk": "high",
       "placeholders_filled": [
         "title",
         "Subtitle 2"
       ],
-      "overflow_risk": "high",
-      "notes_chars": 308,
-      "images": []
+      "shrink_to_fit": [
+        {
+          "autofit": true,
+          "from_pt": 44.0,
+          "reason": "44pt of text would need 107pt of a 116pt box",
+          "runs": 1,
+          "shape": "Title 1",
+          "to_pt": 43.0
+        },
+        {
+          "autofit": true,
+          "from_pt": 32.0,
+          "reason": "32pt of text would need 195pt of a 138pt box",
+          "runs": 1,
+          "shape": "Subtitle 2",
+          "to_pt": 26.0
+        }
+      ],
+      "title_chars": 52
     },
     {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
       "index": 2,
       "layout": "Title and Content",
+      "notes_chars": 298,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 37,
+          "est_lines": 2,
+          "font_pt": 33.0,
+          "needed_pt": 89.1,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 356.4,
+          "chars_per_line": 38,
+          "est_lines": 7,
+          "font_pt": 32.0,
+          "needed_pt": 310.4,
+          "shape": "Content Placeholder 2"
+        }
+      ],
+      "overflow_risk": "medium",
       "placeholders_filled": [
         "title",
         "Content Placeholder 2"
       ],
-      "overflow_risk": "medium",
-      "notes_chars": 328,
-      "images": []
+      "shrink_to_fit": [
+        {
+          "autofit": true,
+          "from_pt": 44.0,
+          "reason": "44pt of text would need 161pt of a 90pt box",
+          "runs": 1,
+          "shape": "Title 1",
+          "to_pt": 33.0
+        }
+      ],
+      "title_chars": 69
     },
     {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
       "index": 3,
       "layout": "Title and Content",
-      "placeholders_filled": [
-        "title",
-        "Content Placeholder 2"
+      "notes_chars": 360,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 28,
+          "est_lines": 2,
+          "font_pt": 44.0,
+          "needed_pt": 118.8,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 356.4,
+          "chars_per_line": 38,
+          "est_lines": 8,
+          "font_pt": 32.0,
+          "needed_pt": 353.6,
+          "shape": "Content Placeholder 2"
+        }
       ],
       "overflow_risk": "high",
-      "notes_chars": 360,
-      "images": []
-    },
-    {
-      "index": 4,
-      "layout": "Title and Content",
       "placeholders_filled": [
         "title",
         "Content Placeholder 2"
       ],
-      "overflow_risk": "medium",
-      "notes_chars": 334,
-      "images": []
+      "shrink_to_fit": [],
+      "title_chars": 29
     },
     {
-      "index": 5,
-      "layout": "Picture with Caption",
-      "placeholders_filled": [
-        "title",
-        "Text Placeholder 3",
-        "Picture Placeholder 2 (picture placed)"
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
+      "index": 4,
+      "layout": "Title and Content",
+      "notes_chars": 280,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 37,
+          "est_lines": 2,
+          "font_pt": 33.0,
+          "needed_pt": 89.1,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 356.4,
+          "chars_per_line": 38,
+          "est_lines": 7,
+          "font_pt": 32.0,
+          "needed_pt": 310.4,
+          "shape": "Content Placeholder 2"
+        }
       ],
       "overflow_risk": "medium",
-      "notes_chars": 333,
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2"
+      ],
+      "shrink_to_fit": [
+        {
+          "autofit": true,
+          "from_pt": 44.0,
+          "reason": "44pt of text would need 107pt of a 90pt box",
+          "runs": 1,
+          "shape": "Title 1",
+          "to_pt": 33.0
+        }
+      ],
+      "title_chars": 51
+    },
+    {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
       "images": [
         {
           "backend": "docx-embedded",
@@ -116,18 +256,46 @@
           "sha256": "c8a49086972fe907bcbe49f01880d3ca54db45c57742f4200fa3bc51a963613a",
           "source_ref": "fig1"
         }
-      ]
-    },
-    {
-      "index": 6,
-      "layout": "Title and Content",
-      "placeholders_filled": [
-        "title",
-        "Content Placeholder 2",
-        "table(5x5)"
+      ],
+      "index": 5,
+      "layout": "Picture with Caption",
+      "notes_chars": 333,
+      "overflow_detail": [
+        {
+          "available_pt": 44.6,
+          "chars_per_line": 41,
+          "est_lines": 1,
+          "font_pt": 20.0,
+          "needed_pt": 27.0,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 39.3,
+          "chars_per_line": 59,
+          "est_lines": 2,
+          "font_pt": 14.0,
+          "needed_pt": 37.8,
+          "shape": "Text Placeholder 3"
+        }
       ],
       "overflow_risk": "medium",
-      "notes_chars": 241,
+      "placeholders_filled": [
+        "title",
+        "Text Placeholder 3",
+        "Picture Placeholder 2 (picture placed)"
+      ],
+      "shrink_to_fit": [],
+      "title_chars": 27
+    },
+    {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
       "images": [
         {
           "backend": "matplotlib (values parsed from the source table)",
@@ -136,29 +304,133 @@
           "sha256": "cf5437b03615425c5c41865a920d34b776efeb23e55c7d4ce9b293ecba7d2b82",
           "source_ref": "tab1"
         }
-      ]
+      ],
+      "index": 6,
+      "layout": "Title and Content",
+      "notes_chars": 241,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 37,
+          "est_lines": 2,
+          "font_pt": 33.0,
+          "needed_pt": 89.1,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 221.0,
+          "chars_per_line": 38,
+          "est_lines": 2,
+          "font_pt": 32.0,
+          "needed_pt": 86.4,
+          "shape": "Content Placeholder 2"
+        }
+      ],
+      "overflow_risk": "medium",
+      "placeholders_filled": [
+        "title",
+        "Content Placeholder 2",
+        "table(5x5)"
+      ],
+      "shrink_to_fit": [
+        {
+          "autofit": true,
+          "from_pt": 44.0,
+          "reason": "44pt of text would need 161pt of a 90pt box",
+          "runs": 1,
+          "shape": "Title 1",
+          "to_pt": 33.0
+        }
+      ],
+      "title_chars": 66
     },
     {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
       "index": 7,
       "layout": "Title and Content",
+      "notes_chars": 326,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 28,
+          "est_lines": 1,
+          "font_pt": 44.0,
+          "needed_pt": 59.4,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 356.4,
+          "chars_per_line": 38,
+          "est_lines": 3,
+          "font_pt": 32.0,
+          "needed_pt": 129.6,
+          "shape": "Content Placeholder 2"
+        }
+      ],
+      "overflow_risk": "low",
       "placeholders_filled": [
         "title",
         "Content Placeholder 2"
       ],
-      "overflow_risk": "low",
-      "notes_chars": 326,
-      "images": []
+      "shrink_to_fit": [],
+      "title_chars": 11
     },
     {
+      "autofit_frames": 2,
+      "furniture_cloned": 3,
+      "furniture_present": [
+        "DATE",
+        "FOOTER",
+        "SLIDE_NUMBER"
+      ],
+      "furniture_text_cleared": 0,
+      "images": [],
       "index": 8,
       "layout": "Title and Content",
+      "notes_chars": 278,
+      "overflow_detail": [
+        {
+          "available_pt": 90.0,
+          "chars_per_line": 28,
+          "est_lines": 1,
+          "font_pt": 44.0,
+          "needed_pt": 59.4,
+          "shape": "Title 1"
+        },
+        {
+          "available_pt": 356.4,
+          "chars_per_line": 38,
+          "est_lines": 3,
+          "font_pt": 32.0,
+          "needed_pt": 129.6,
+          "shape": "Content Placeholder 2"
+        }
+      ],
+      "overflow_risk": "low",
       "placeholders_filled": [
         "title",
         "Content Placeholder 2"
       ],
-      "overflow_risk": "low",
-      "notes_chars": 278,
-      "images": []
+      "shrink_to_fit": [],
+      "title_chars": 10
     }
+  ],
+  "fonts_used": [
+    "Liberation Serif"
+  ],
+  "warnings": [
+    "slide 1: Title 1 text was fitted from 44pt to 43pt so it stays inside its placeholder",
+    "slide 1: Subtitle 2 text was fitted from 32pt to 26pt so it stays inside its placeholder",
+    "slide 2: Title 1 text was fitted from 44pt to 33pt so it stays inside its placeholder",
+    "slide 4: Title 1 text was fitted from 44pt to 33pt so it stays inside its placeholder",
+    "slide 6: Title 1 text was fitted from 44pt to 33pt so it stays inside its placeholder"
   ]
 }

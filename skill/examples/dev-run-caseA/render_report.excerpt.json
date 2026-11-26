@@ -1,72 +1,90 @@
 {
-  "_excerpt": "key fields of the real render_report.json (per-PNG hashes/paths trimmed)",
   "schema": "render_report/v1",
   "renderer": {
     "name": "libreoffice-kit",
     "version": "native",
     "available": true,
     "strategy": "bounded-search",
-    "command": "<abs-path-not-shipped> <abs-path-not-shipped> Harness\\resources\\app.asar.unpacked\\dsh\\node_modules\\@deepseek-ai\\libreoffice-kit\\lib\\cli.js"
+    "command": "<redacted-path> <redacted-path> Harness\\resources\\app.asar.unpacked\\dsh\\node_modules\\@deepseek-ai\\libreoffice-kit\\lib\\cli.js"
   },
-  "status": "ok",
-  "error": null,
-  "uncertainty": [
-    "The renderer could not find these font families: Liberation Serif -- glyphs are therefore substituted, so the previews are a substitute render and must not be read as a certificate of font fidelity. Measured: the exported PDF embeds /BAAAAA+TimesNewRomanPSMT, /CAAAAA+TimesNewRomanPSMT, /DAAAAA+TimesNewRomanPSMT, /EAAAAA+TimesNewRomanPSMT, /FAAAAA+ArialMT, /GAAAAA+TimesNewRomanPSMT, /HAAAAA+TimesNewRomanPS-BoldMT, /IAAAAA+TimesNewRomanPSMT, /JAAAAA+TimesNewRomanPSMT, /KAAAAA+TimesNewRomanPSMT instead."
-  ],
   "pdf": {
+    "path": "<redacted-path>",
     "pages": 8,
-    "bytes": 254669,
-    "sha256": "f62039d4f5e3504a0325d44e14b4a7017cb9e7999b4846a107dd430a905b6503",
-    "path": "output/render/deck.pdf"
+    "bytes": 253277,
+    "sha256": "0759f3edb7c31104aaca476c659a318ccbf3cbfac955fd7faba3c59091d33d54"
   },
   "pngs": [
     {
       "slide": 1,
+      "path": "<redacted-path>",
+      "bytes": 73544,
       "width": 1441,
       "height": 1081,
-      "bytes": 76382
+      "nonbackground_ratio": 0.184479
     },
     {
       "slide": 2,
+      "path": "<redacted-path>",
+      "bytes": 107139,
       "width": 1441,
       "height": 1081,
-      "bytes": 98174
+      "nonbackground_ratio": 0.260781
     },
     {
       "slide": 3,
+      "path": "<redacted-path>",
+      "bytes": 121199,
       "width": 1441,
       "height": 1081,
-      "bytes": 121199
+      "nonbackground_ratio": 0.289167
     },
     {
       "slide": 4,
+      "path": "<redacted-path>",
+      "bytes": 108126,
       "width": 1441,
       "height": 1081,
-      "bytes": 99019
+      "nonbackground_ratio": 0.252812
     },
     {
       "slide": 5,
+      "path": "<redacted-path>",
+      "bytes": 75489,
       "width": 1441,
       "height": 1081,
-      "bytes": 75489
+      "nonbackground_ratio": 0.229323
     },
     {
       "slide": 6,
+      "path": "<redacted-path>",
+      "bytes": 108483,
       "width": 1441,
       "height": 1081,
-      "bytes": 108497
+      "nonbackground_ratio": 0.544375
     },
     {
       "slide": 7,
+      "path": "<redacted-path>",
+      "bytes": 45635,
       "width": 1441,
       "height": 1081,
-      "bytes": 45635
+      "nonbackground_ratio": 0.128698
     },
     {
       "slide": 8,
+      "path": "<redacted-path>",
+      "bytes": 56505,
       "width": 1441,
       "height": 1081,
-      "bytes": 56505
+      "nonbackground_ratio": 0.148125
     }
+  ],
+  "status": "ok",
+  "missing_fonts": [
+    "Liberation Serif"
+  ],
+  "error": null,
+  "uncertainty": [
+    "The renderer could not find these font families: Liberation Serif -- glyphs are therefore substituted, so the previews are a substitute render and must not be read as a certificate of font fidelity. Measured: the exported PDF embeds /BAAAAA+TimesNewRomanPSMT, /CAAAAA+TimesNewRomanPSMT, /DAAAAA+TimesNewRomanPSMT, /EAAAAA+TimesNewRomanPSMT, /FAAAAA+ArialMT, /GAAAAA+TimesNewRomanPSMT, /HAAAAA+TimesNewRomanPSMT, /IAAAAA+TimesNewRomanPS-BoldMT, /JAAAAA+TimesNewRomanPSMT, /KAAAAA+TimesNewRomanPSMT instead."
   ]
 }

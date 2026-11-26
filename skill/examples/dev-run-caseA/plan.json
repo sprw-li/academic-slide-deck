@@ -13,7 +13,7 @@
       "title": null,
       "tone": null
     },
-    "_task_card": "input/\\task.md",
+    "_task_card": "<redacted-path>",
     "audience": "课题组组会 (supervisor + peer graduate students)",
     "duration_min": 10.0,
     "language": "en",
@@ -50,7 +50,7 @@
       "Title and Vertical Text",
       "Vertical Title and Text"
     ],
-    "template_path": "input/\\materials\\template-organizer.pptx"
+    "template_path": "<redacted-path>"
   },
   "excluded": [
     {
@@ -158,39 +158,31 @@
       "reason": "no bullet: the method page already has 3 bullets, the contract maximum"
     },
     {
-      "item": "Composition and textural properties of the synthetic series.",
-      "reason": "bullet removed from slide 11: its wording already appears on an earlier page or in a title of this deck"
-    },
-    {
-      "item": "Kinetic parameters from the synthetic degradation runs.",
-      "reason": "bullet removed from slide 12: its wording already appears on an earlier page or in a title of this deck"
-    },
-    {
       "item": "Results Phase analysis detected anatase only; no rutile or T",
-      "reason": "bullet removed from slide 14: its wording already appears on an earlier page or in a title of this deck"
+      "reason": "bullet removed from slide 13: its wording already appears on an earlier page or in a title of this deck"
     },
     {
-      "item": "slide 2 (outline) 'Outline'",
+      "item": "slide 0 (outline) 'Outline'",
       "reason": "not kept: the case allows 8 slides and the outline role (rank 8) sits below the figure/table/limitation pages that were kept"
     },
     {
-      "item": "slide 6 (result) 'Key result: Results (second)'",
+      "item": "slide 5 (result) 'The fit quality was R2 = 0.994 over seven points'",
       "reason": "not kept: the case allows 8 slides and the result role (rank 3) sits below the figure/table/limitation pages that were kept"
     },
     {
-      "item": "slide 8 (figure) 'Figure: Normalised methylene blue'",
+      "item": "slide 7 (figure) 'Figure: Normalised methylene blue'",
       "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
     },
     {
-      "item": "slide 9 (figure) 'Figure: Pseudo-first-order'",
+      "item": "slide 8 (figure) 'Figure: Pseudo-first-order'",
       "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
     },
     {
-      "item": "slide 10 (figure) 'Figure: Removal of methylene blue'",
+      "item": "slide 9 (figure) 'Figure: Removal of methylene blue'",
       "reason": "not kept: the case allows 8 slides and the figure role (rank 5) sits below the figure/table/limitation pages that were kept"
     },
     {
-      "item": "slide 12 (table) 'Table: Kinetic parameters from the synthetic degradation runs'",
+      "item": "slide 11 (table) 'Table: Kinetic parameters from the synthetic degradation runs'",
       "reason": "not kept: the case allows 8 slides and the table role (rank 6) sits below the figure/table/limitation pages that were kept"
     },
     {
@@ -210,14 +202,14 @@
       "reason": "not placed: the deck is 8 slides and the kept pages rank higher; its cells stay available in material.json with their locator"
     }
   ],
-  "generated": "2026-11-23T05:56:37Z",
+  "generated": "2026-11-26T14:53:20Z",
   "narrative": {
     "arc": "problem -> method -> result -> limitation -> conclusion",
     "main_thread": [
-      "1. title — Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study",
-      "2. problem — Problem: Abstract",
+      "1. title — Nitrogen-Doped TiO2 Photocatalysts for Visible-Light",
+      "2. problem — Five consecutive reuse cycles retained 88.1 % of the initial activity",
       "3. method — Method: Materials and Methods",
-      "4. result — Key result: Results",
+      "4. result — The nitrogen content from CHN analysis was 3.4 at.%",
       "5. figure — Figure: Synthetic schematic",
       "6. table — Table: Composition and textural properties of the synthetic series",
       "7. limitation — Limitations",
@@ -248,7 +240,7 @@
       "numbers_used": [],
       "role": "title",
       "table_ref": null,
-      "title": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light Degradation of Methylene Blue: A Kinetic Study"
+      "title": "Nitrogen-Doped TiO2 Photocatalysts for Visible-Light"
     },
     {
       "bullets": [
@@ -256,7 +248,7 @@
         "Five consecutive reuse cycles retained 88.1 % of the initial activity.",
         "Every value in this paragraph is invented for the fixture."
       ],
-      "claim": "The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994.",
+      "claim": "Five consecutive reuse cycles retained 88.1 % of the initial activity",
       "evidence": [
         {
           "locator": {
@@ -293,7 +285,7 @@
       "index": 2,
       "layout_hint": "title-content",
       "layout_name": "Title and Content",
-      "notes": "State the research gap in one breath and let the audience see why it matters scientifically, not commercially. Key claim: The decay followed pseudo-first-order kinetics with a rate constant of 0.0312 min-1 and R2 = 0.994. Traceability: the text on this page is quoted from paper.docx. It sits in the Abstract part of the source.",
+      "notes": "State the research gap in one breath and let the audience see why it matters scientifically, not commercially. Key claim: Five consecutive reuse cycles retained 88.1 % of the initial activity Traceability: the text on this page is quoted from paper.docx. It sits in the Abstract part of the source.",
       "numbers_used": [
         {
           "locator": {
@@ -368,7 +360,7 @@
       ],
       "role": "problem",
       "table_ref": null,
-      "title": "Problem: Abstract"
+      "title": "Five consecutive reuse cycles retained 88.1 % of the initial activity"
     },
     {
       "bullets": [
@@ -666,7 +658,7 @@
         "The nitrogen content from CHN analysis was 3.4 at.%.",
         "Pore volume was 0.21 cm3/g with a mean pore diameter of 9.4 nm."
       ],
-      "claim": "Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit.",
+      "claim": "The nitrogen content from CHN analysis was 3.4 at.%",
       "evidence": [
         {
           "locator": {
@@ -703,7 +695,7 @@
       "index": 4,
       "layout_hint": "title-content",
       "layout_name": "Title and Content",
-      "notes": "Give the headline number first, then the comparison it is measured against, then what the comparison rules out. Key claim: Phase analysis detected anatase only; no rutile or TiN reflections appeared at the 0.5 % detection limit. Traceability: the text on this page is quoted from paper.docx. It sits in the Results part of the source.",
+      "notes": "Give the headline number first, then the comparison it is measured against, then what the comparison rules out. Key claim: The nitrogen content from CHN analysis was 3.4 at.% Traceability: the text on this page is quoted from paper.docx. It sits in the Results part of the source.",
       "numbers_used": [
         {
           "locator": {
@@ -768,7 +760,7 @@
       ],
       "role": "result",
       "table_ref": null,
-      "title": "Key result: Results"
+      "title": "The nitrogen content from CHN analysis was 3.4 at.%"
     },
     {
       "bullets": [
@@ -859,7 +851,9 @@
       "title": "Figure: Synthetic schematic"
     },
     {
-      "bullets": [],
+      "bullets": [
+        "Composition and textural properties of the synthetic series."
+      ],
       "claim": "Table 1. Composition and textural properties of the synthetic series.",
       "evidence": [
         {
@@ -1179,8 +1173,8 @@
     }
   ],
   "stats": {
-    "bullets": 11,
-    "excluded": 39,
+    "bullets": 12,
+    "excluded": 37,
     "figures_used": 1,
     "numbers_used": 67,
     "slides": 8,
@@ -1188,7 +1182,7 @@
     "warnings": 1
   },
   "uncertainty": [
-    "3 page(s) carry no bullet list because the material offered no whole sentence for them; their claim and evidence are still recorded"
+    "2 page(s) carry no bullet list because the material offered no whole sentence for them; their claim and evidence are still recorded"
   ],
   "warnings": [
     "task card read for constraints: task.md (fields taken from the task card are recorded in constraints._sources)"
