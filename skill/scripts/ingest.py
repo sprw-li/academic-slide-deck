@@ -47,6 +47,9 @@ import os
 import re
 import shutil
 import subprocess
+import zipfile
+import zlib
+import xml.etree.ElementTree as ET
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in _sys.path:
@@ -454,32 +457,202 @@ def _is_task_card(path):
                     "readme.md", "case.md")
 
 
-def extract_pdf(path, source_id, work_dir, warnings):
-    """PDF via pdfplumber (text/tables/figures), pypdf as a text-only fallback."""
-    pdfplumber = C.try_import("pdfplumber")
-    pages, figures, tables = [], [], []
-    if pdfplumber is not None:
+def _pdftotext(path, source_id, warnings):
+    """Extract PDF text with an external ``pdftotext`` (the challenge's pdf-text-tool)."""
+    exe = shutil.which("pdftotext") or shutil.which("pdftotext.exe")
+    if not exe:
+        return []
+    try:
+        completed = subprocess.run([exe, "-layout", "-enc", "UTF-8", path, "-"],
+                                   capture_output=True, timeout=180)
+        if completed.returncode != 0:
+            warnings.append("%s: pdftotext exited %s" % (source_id,
+                                                         completed.returncode))
+            return []
+        raw = completed.stdout.decode("utf-8", "replace")
+    except Exception as exc:
+        warnings.append("%s: pdftotext failed (%s: %s)"
+                        % (source_id, type(exc).__name__, exc))
+        return []
+    pages = raw.split("\f")
+    out = []
+    for index, text in enumerate(pages, start=1):
+        if index > MAX_PDF_PAGES:
+            break
+        out.append({"n": index, "text": text[:MAX_PAGE_CHARS]})
+    if len(pages) > MAX_PDF_PAGES:
+        warnings.append("%s: %d pages, only the first %d were ingested"
+                        % (source_id, len(pages), MAX_PDF_PAGES))
+    return out
+
+
+_PDF_STRING_RE = re.compile(rb"\((?:\\.|[^\\()])*\)")
+
+
+def _pdf_unescape(token):
+    """Decode a PDF literal string token ``(...)`` into text (best effort)."""
+    raw = token[1:-1] if token.startswith(b"(") else token
+    out = bytearray()
+    index = 0
+    escapes = {b"n": 10, b"r": 13, b"t": 9, b"b": 8, b"f": 12, b"(": 40, b")": 41,
+               b"\\": 92}
+    while index < len(raw):
+        byte = raw[index:index + 1]
+        if byte == b"\\" and index + 1 < len(raw):
+            nxt = raw[index + 1:index + 2]
+            if nxt in escapes:
+                out.append(escapes[nxt])
+                index += 2
+                continue
+            if nxt.isdigit():                     # octal escape, up to 3 digits
+                digits = raw[index + 1:index + 4]
+                match = re.match(rb"[0-7]{1,3}", digits)
+                if match:
+                    out.append(int(match.group(0), 8) & 0xFF)
+                    index += 1 + len(match.group(0))
+                    continue
+            index += 2
+            continue
+        out.append(byte[0])
+        index += 1
+    text = out.decode("latin-1", "replace")
+    for marker in ("\u0000", "\u0001", "\u0002", "\u0003"):
+        text = text.replace(marker, "")
+    return text
+
+
+def _pdf_hex_text(token):
+    """Decode a PDF hex string ``<...>`` when it yields readable text.
+
+    Simple PDFs store ASCII (or UTF-16BE) text as hex; font-subset PDFs store **CID
+    glyph indices** instead, which cannot be decoded without the font's ``ToUnicode``
+    CMap.  So the decoded bytes are kept only when they look like real text, and the
+    caller records a warning when nothing readable comes out.
+    """
+    try:
+        raw = bytes.fromhex(re.sub(rb"[^0-9A-Fa-f]", b"", token[1:-1]).decode())
+    except ValueError:
+        return ""
+    if not raw:
+        return ""
+    for encoding in ("utf-16-be", "latin-1"):
         try:
-            with pdfplumber.open(path) as pdf:
-                page_cap = min(len(pdf.pages), MAX_PDF_PAGES)
-                if len(pdf.pages) > MAX_PDF_PAGES:
-                    warnings.append("%s: %d pages, only the first %d were ingested"
-                                    % (source_id, len(pdf.pages), MAX_PDF_PAGES))
-                for index in range(page_cap):
-                    page = pdf.pages[index]
-                    text = page.extract_text(x_tolerance=1.5, y_tolerance=2.0) or ""
-                    text = text[:MAX_PAGE_CHARS]
-                    pages.append({"n": index + 1, "text": text})
-                    figures.extend(_pdf_figures_on_page(page, index + 1, source_id,
-                                                       work_dir, warnings))
-                    tables.extend(_pdf_tables_on_page(page, index + 1, source_id,
-                                                      warnings))
-        except Exception as exc:
-            warnings.append("%s: pdfplumber failed (%s: %s); falling back to pypdf"
-                            % (source_id, type(exc).__name__, exc))
-            pages = []
+            candidate = raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+        printable = sum(1 for ch in candidate if ch.isprintable() or ch in "\n\t ")
+        if candidate and printable / float(len(candidate)) > 0.85 and \
+                sum(ch.isalpha() for ch in candidate) >= max(3, len(candidate) // 6):
+            return candidate
+    return ""
+
+
+def _pdf_text_raw_recover(path, source_id, warnings):
+    """Last-resort PDF text: inflate content streams and read the text operators.
+
+    This uses only ``zlib`` + ``re``, so it works in a container with no PDF library
+    at all.  It is a genuine degradation - ligatures, CID fonts and re-ordered text
+    can be lost - which is why the warnings say exactly that.
+    """
+    try:
+        with open(path, "rb") as fh:
+            data = fh.read()
+    except OSError as exc:
+        warnings.append("%s: cannot read the PDF bytes (%s)" % (source_id, exc))
+        return []
+    pages_text = []
+    text_streams = 0
+    for match in re.finditer(rb"stream\r?\n", data):
+        start = match.end()
+        end = data.find(b"endstream", start)
+        if end < 0 or end - start > 8 * 1024 * 1024:
+            continue
+        chunk = data[start:end]
+        try:
+            content = zlib.decompress(chunk)
+        except zlib.error:
+            content = chunk
+        if b"BT" not in content or (b"Tj" not in content and b"TJ" not in content):
+            continue
+        text_streams += 1
+        pieces = []
+        for token in re.finditer(
+                rb"\((?:\\.|[^\\()])*\)\s*Tj"          # (text) Tj
+                rb"|<[0-9A-Fa-f\s]*>\s*Tj"             # <hex> Tj
+                rb"|\[(?:[^\[\]]*)\]\s*TJ"             # [(a) -20 <b>] TJ
+                rb"|T\*|Td|TD|ET", content):
+            item = token.group(0)
+            if item.endswith(b"Tj") or item.endswith(b"TJ"):
+                for string in _PDF_STRING_RE.finditer(item):
+                    pieces.append(_pdf_unescape(string.group(0)))
+                for hex_token in re.finditer(rb"<[0-9A-Fa-f\s]*>", item):
+                    pieces.append(_pdf_hex_text(hex_token.group(0)))
+            else:
+                pieces.append("\n")
+        text = "".join(pieces)
+        text = re.sub(r"[ \t]+", " ", text)
+        text = re.sub(r"\n{3,}", "\n\n", text).strip()
+        if len(text) >= 25:
+            pages_text.append(text)
+    out = [{"n": index, "text": text[:MAX_PAGE_CHARS]}
+           for index, text in enumerate(pages_text, start=1)]
+    if out:
+        warnings.append("%s: PDF text was recovered from the raw content streams with "
+                        "zlib (no PDF library was importable); ligatures and CID text "
+                        "may be missing, and page order is approximate" % source_id)
+    elif text_streams:
+        warnings.append("%s: %d text stream(s) were found but their strings are CID "
+                        "glyph indices, which cannot be decoded without the font CMap "
+                        "(a PDF library); no text was recovered for this file"
+                        % (source_id, text_streams))
+    return out
+
+
+def extract_pdf(path, source_id, work_dir, warnings):
+    """PDF text via, in order: ``pdftotext`` → ``pypdf`` → ``pdfplumber`` → raw streams.
+
+    A missing PDF library must never abort the run: each step is guarded, the next one
+    is tried, and anything that cannot be read is recorded as a warning.  Only when the
+    text is in hand are tables/figures/bboxes attempted (that needs pdfplumber).
+    """
+    pages, figures, tables = [], [], []
+    pages = _pdftotext(path, source_id, warnings)
     if not pages:
         pages = _pdf_text_pypdf(path, source_id, warnings)
+    if not pages:
+        pages = _pdf_text_raw_recover(path, source_id, warnings)
+    pdfplumber = C.try_import("pdfplumber")
+    if pdfplumber is None:
+        warnings.append("%s: pdfplumber is not importable, so figure regions and table "
+                        "cells are unavailable for this PDF (text was obtained by "
+                        "another route)" % source_id)
+        if not pages:
+            warnings.append("%s: no PDF text could be extracted by any route"
+                            % source_id)
+        return {"pages": pages, "figures": figures, "tables": tables}
+    try:
+        with pdfplumber.open(path) as pdf:
+            page_cap = min(len(pdf.pages), MAX_PDF_PAGES)
+            if len(pdf.pages) > MAX_PDF_PAGES:
+                warnings.append("%s: %d pages, only the first %d were ingested"
+                                % (source_id, len(pdf.pages), MAX_PDF_PAGES))
+            for index in range(page_cap):
+                page = pdf.pages[index]
+                text = page.extract_text(x_tolerance=1.5, y_tolerance=2.0) or ""
+                text = text[:MAX_PAGE_CHARS]
+                if index < len(pages) and pages[index]["text"].strip():
+                    # keep the text we already have; only fill pages pdfplumber sees
+                    pages[index]["text"] = pages[index]["text"] or text
+                elif index < len(pages):
+                    pages[index]["text"] = text
+                else:
+                    pages.append({"n": index + 1, "text": text})
+                figures.extend(_pdf_figures_on_page(page, index + 1, source_id,
+                                                   work_dir, warnings))
+                tables.extend(_pdf_tables_on_page(page, index + 1, source_id, warnings))
+    except Exception as exc:
+        warnings.append("%s: pdfplumber failed (%s: %s); keeping the text already "
+                        "extracted" % (source_id, type(exc).__name__, exc))
     return {"pages": pages, "figures": figures, "tables": tables}
 
 
@@ -723,11 +896,54 @@ def _match_table_cells(found, extracted, cap_bbox, used):
 # --------------------------------------------------------------------------- #
 # DOCX
 # --------------------------------------------------------------------------- #
+def _docx_text_stdlib(path, source_id, warnings):
+    """Recover DOCX text with ``zipfile`` + ElementTree (no python-docx needed).
+
+    A ``.docx`` is a ZIP with ``word/document.xml``; paragraph text is ``w:t`` runs
+    inside ``w:p``.  This keeps the paper readable in a container without python-docx.
+    """
+    namespace = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    try:
+        with zipfile.ZipFile(path) as zf:
+            raw = zf.read("word/document.xml")
+    except (OSError, KeyError, zipfile.BadZipFile) as exc:
+        warnings.append("%s: cannot read word/document.xml (%s: %s)"
+                        % (source_id, type(exc).__name__, exc))
+        return {"pages": [], "figures": [], "tables": []}
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError as exc:
+        warnings.append("%s: word/document.xml does not parse (%s)" % (source_id, exc))
+        return {"pages": [], "figures": [], "tables": []}
+    paragraphs, table_rows = [], []
+    for body in root.iter(namespace + "body"):
+        for child in body:
+            tag = child.tag.split("}")[-1]
+            if tag == "p":
+                text = "".join(node.text or "" for node in child.iter(namespace + "t"))
+                if text.strip():
+                    paragraphs.append(text)
+            elif tag == "tbl":
+                for row in child.iter(namespace + "tr"):
+                    cells = ["".join(node.text or ""
+                                     for node in cell.iter(namespace + "t")).strip()
+                             for cell in row if cell.tag.endswith("}tc")]
+                    if any(cells):
+                        table_rows.append(cells)
+    text = "\n".join(paragraphs)
+    for row in table_rows:
+        text += "\n" + " | ".join(row)
+    warnings.append("%s: python-docx is not importable; DOCX text was recovered from "
+                    "the package with zipfile+ElementTree (tables become text rows)"
+                    % source_id)
+    return {"pages": [{"n": 1, "text": text[:MAX_PAGE_CHARS]}],
+            "figures": [], "tables": []}
+
+
 def extract_docx(path, source_id, work_dir, warnings):
     docx = C.try_import("docx")
     if docx is None:
-        warnings.append("%s: python-docx is not importable — DOCX skipped" % source_id)
-        return {"pages": [], "figures": [], "tables": []}
+        return _docx_text_stdlib(path, source_id, warnings)
     try:
         document = docx.Document(path)
     except Exception as exc:
@@ -1141,12 +1357,19 @@ def ingest(case_path, work_dir, input_dir=None, out_path=None, log=None):
         if log:
             log.info("ingesting %s" % key, kind=kind, role="task_card" if task_card
                      else "material")
-        if kind == "pdf":
-            data = extract_pdf(path, source_id, work_dir, warnings)
-        elif kind == "docx":
-            data = extract_docx(path, source_id, work_dir, warnings)
-        else:
-            data = extract_text_file(path, source_id, kind, warnings)
+        # No extractor may abort the run: a thin container must still yield material.
+        try:
+            if kind == "pdf":
+                data = extract_pdf(path, source_id, work_dir, warnings)
+            elif kind == "docx":
+                data = extract_docx(path, source_id, work_dir, warnings)
+            else:
+                data = extract_text_file(path, source_id, kind, warnings)
+        except Exception as exc:
+            warnings.append("%s: extraction failed (%s: %s); this source contributes "
+                            "no text to material.json"
+                            % (key, type(exc).__name__, exc))
+            data = {"pages": [], "figures": [], "tables": []}
 
         pages = data.get("pages") or []
         if not pages or not any(p["text"].strip() for p in pages):

@@ -43,6 +43,14 @@ not an N/A, because the check's subject exists but is empty.
 `evidence` column = the artefact each check actually reads (its `checks[].evidence` pointer
 follows the same item). "severity" is the severity written into `defects[]`.
 
+**The deck reader has two backends.** `verify_deck.py` reads the deck through `zipfile` +
+`xml.etree.ElementTree` (both stdlib) into a model; python-pptx, when importable, is only an
+equivalent adapter. Measured with the imports blocked the way a thin container would
+(`BLOCK_IMPORTS=pptx`, `pptx,lxml`, and `pptx,lxml,pypdf,pdfplumber,PIL,matplotlib`), the
+verifier returns the **same verdict** `PASS 20/20` on a real deck in every case — it neither
+crashes nor degrades to UNVERIFIED. V07/V08/V09 use ElementTree structural comparison when lxml
+is absent, so the template checks survive too.
+
 | id | What it checks | Reads | FAIL when | UNVERIFIED when | Sev |
 |---|---|---|---|---|---|
 | **V01** | slide count within the case constraint | **the deck file** (slide count) + `case.json`/`plan.constraints` (constraint) | count is outside the declared `slide_count` / `slide_count_range` | no constraint found in any accepted spelling; or no readable deck | high |
@@ -64,6 +72,33 @@ follows the same item). "severity" is the severity written into `defects[]`.
 | **V17** | no constraint/input leakage into content | slide/notes text vs declared metadata | a *labelled* brief field (`Audience:`, `Duration:`, `slide_count =`), the declared audience string, the template file name, or a `<duration> min` phrasing appears | no slide text; or no constraint metadata declared at all | medium |
 | **V18** | `build_report` describes the deck under inspection | `build_report.pptx` vs the deck actually inspected | the two disagree (the **work-dir deck** is always the one inspected) | — | high |
 | **V19** | minimum content coverage (anti false-green) | declared source files, `material.json`, `plan.json`, slide text | see §4 — any of R1–R5 | — (may be **N/A → SKIP**) | high |
+| **V20** | the run produced deliverables | `--out` contents (a readable `.pptx`, `slide-*.png`), `result.json.status`, `render_report.status` | no readable deck in `--out` and none declared by `result.json`; or `status=="failed"`; or render says `ok` while fewer previews than slides exist | `status=="partial"` — a deck was delivered but the run declares itself incomplete, so completeness cannot be certified | high |
+
+### V20's exact rule (direction matters)
+
+A missing artefact must never read as success, but a partial-but-honest run must still report its
+real verdict. The implemented rule, in order:
+
+1. **no readable `.pptx`** in `--out` (and none valid at a path `result.json` declares) → `FAIL`.
+   A run that produces no deck cannot be graded as a complete solution. A file that exists but is
+   not a readable deck (not a zip / no slide parts / 0 bytes) is also `FAIL`.
+2. `result.json.status == "failed"` → `FAIL`.
+3. `result.json.status == "partial"` → **`UNVERIFIED`** — deliberately *not* PASS (incomplete is
+   not success) and deliberately *not* FAIL (the deck is real, and every other check keeps its own
+   verdict; one incomplete run must not erase the rest of the report).
+4. `render_report.status == "ok"` but fewer non-empty previews than slides → `FAIL` (the render
+   advertised itself as complete and is not).
+5. otherwise → `PASS`, with the deck size, slide-part count, preview count and both statuses in
+   the detail. If the deck was only found at a path declared by `result.json` rather than inside
+   `--out`, a **WARN** notes that the platform reads the output directory.
+
+**Why `status` is not derived from the verdict:** V20 reads `result.json.status`, so if
+`result_contract.py` computed `status` from the gate verdict the two would be circular and a run
+could never climb out of a provisional `partial`. `status` therefore describes **deliverable
+completeness only**; correctness is published separately in `result.json._self_check`
+(`verify_verdict`, `checks_failed`) and repeated in `uncertainty`. Measured: before the split, a
+complete run reported `partial` forever because the first `result_contract` pass ran before the
+gate.
 
 Two structural notes:
 

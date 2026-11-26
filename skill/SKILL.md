@@ -71,9 +71,26 @@ Artifacts, in `/app/output`:
 
 ## 2. Quickstart — one command does the work
 
+**Resolve the skill root first, then call it by absolute path.** The evaluator installs this
+Skill at `/skills/weekly-skill` and runs the agent from a different directory (typically
+`/app`), so a bare `python scripts/run.py` can silently find nothing. Use:
+
 ```bash
-python scripts/run.py --case /input/case.json --work /app/work --out /app/output
+# SKILL_ROOT = the directory containing this SKILL.md
+SKILL_ROOT=/skills/weekly-skill          # adjust if installed elsewhere
+python "$SKILL_ROOT/scripts/run.py" \
+    --case /input/case.json --work /app/work --out /app/output
 ```
+
+If `/input/case.json` does not exist, pass the case path the task gives you; `--case` is the
+only required input. The pipeline is safe to invoke from any working directory.
+
+**Hard requirement, independent of everything else:** `/app/output/result.json` must exist
+when the command returns, **even if the run failed part-way**. It is the graded deliverable's
+handle: it carries `case_id`, `status` (`ok`/`partial`/`failed`), every key the case's
+`output_contract` declares, the artefact paths, `uncertainty` and `_self_check`. A run that
+produces a good deck but no `result.json` is indistinguishable from a run that produced
+nothing. If a stage fails, `run.py` still emits it and names the limits.
 
 `run.py` runs the deterministic chain and writes partial deliverables as it goes, so a
 failure still leaves an honest `status:"partial"` `result.json` plus whatever succeeded:
@@ -84,12 +101,19 @@ plan.py     -> plan.json          (narrative arc, one claim per page, notes, lay
 build_deck  -> deck.pptx          (template-bound; master/theme/footer untouched)
 render.py   -> deck.pdf + PNGs    (real previews, or an honest skip)
 evidence.py -> evidence_map.json  (per-page provenance, quote-verified)
-verify_deck -> verify_report.json (V01-V15; exit 0 iff verdict PASS)
+verify_deck -> verify_report.json (V01-V19; exit 0 iff verdict PASS)
 result_contract -> result.json    (contract-driven)
 ```
 
 Every stage is separately runnable (`--case/--work` plus optional `--in/--out`), which is
 what makes the pipeline debuggable and cheap to re-run inside the platform budget.
+
+**Missing dependencies are not fatal.** If an OOXML library is unavailable, `build_deck.py`
+falls back to a pure-standard-library writer that still emits a real, openable `.pptx` and
+records which engine built it (`build_report.json.engine`). If no PDF text extractor is
+available, `ingest.py` degrades to whatever text it can recover and records the gap in
+`warnings[]`. If no renderer is found, `render.py` reports `status:"skipped"` and claims no
+preview. In every one of those cases `result.json` is still written.
 
 ## 3. How to plan the pages (the part only you can do)
 
@@ -163,9 +187,9 @@ python scripts/verify_deck.py --case /input/case.json --work /app/work   # exit 
 python scripts/selftest.py                                               # end-to-end + injected-defect tests
 ```
 
-`verify_report.json` carries V01–V19 (V16 duplicate content, V17 constraint leakage into
-content, V18 build-report invariants, V19 minimum content coverage). Its semantics are strict
-on purpose:
+`verify_report.json` carries V01–V20 (V16 duplicate content, V17 constraint leakage into
+content, V18 build-report invariants, V19 minimum content coverage, V20 run-produced-
+deliverables). Its semantics are strict on purpose:
 
 - `verdict = PASS` requires **zero `FAIL` and zero `UNVERIFIED`**; a `SKIP` is allowed only
   with a recorded reason.

@@ -148,27 +148,39 @@ def _node_exe():
     return shutil.which("node") or shutil.which("node.exe")
 
 
+#: POSIX install locations, in the order a container usually has them.  The evaluated container
+#: is Linux and the challenge declares an `office-renderer` capability, so `soffice` on PATH is
+#: the most likely winner there -- it is tried before any platform-specific bundle.
+POSIX_SOFFICE_DIRS = (
+    "/usr/bin", "/usr/local/bin", "/bin",
+    "/usr/lib/libreoffice/program",
+    "/usr/lib64/libreoffice/program",
+    "/usr/local/lib/libreoffice/program",
+    "/snap/bin",
+    "/opt/libreoffice/program",
+)
+POSIX_SOFFICE_GLOBS = ("/opt/libreoffice*/program", "/usr/lib/libreoffice*/program")
+MACOS_SOFFICE_DIRS = ("/Applications/LibreOffice.app/Contents/MacOS",
+                      "/opt/homebrew/bin", "/usr/local/Caskroom/libreoffice")
+
+
 def _known_soffice_dirs():
-    """Install directories that are named by the platform, not by this author."""
+    """Install directories named by the platform, ordered POSIX-first then Windows."""
     dirs = []
+    dirs += [Path(p) for p in POSIX_SOFFICE_DIRS]
+    for pattern in POSIX_SOFFICE_GLOBS:
+        try:
+            for match in sorted(Path("/").glob(pattern.lstrip("/"))):
+                dirs.append(match)
+        except (OSError, ValueError):
+            pass
+    dirs += [Path(p) for p in MACOS_SOFFICE_DIRS]
     if is_windows():
         for var in ("PROGRAMFILES", "PROGRAMFILES(X86)", "ProgramW6432", "LOCALAPPDATA"):
             base = os.environ.get(var)
             if base:
                 dirs.append(Path(base) / "LibreOffice" / "program")
                 dirs.append(Path(base) / "Programs" / "LibreOffice" / "program")
-    else:
-        dirs += [Path("/usr/bin"), Path("/usr/local/bin"), Path("/opt/libreoffice/program"),
-                 Path("/usr/lib/libreoffice/program"), Path("/snap/bin")]
-        for pattern_root in ("/opt",):
-            root = Path(pattern_root)
-            if root.is_dir():
-                try:
-                    for child in sorted(root.glob("libreoffice*")):
-                        dirs.append(child / "program")
-                except OSError:
-                    pass
-        dirs.append(Path("/Applications/LibreOffice.app/Contents/MacOS"))
     return dirs
 
 

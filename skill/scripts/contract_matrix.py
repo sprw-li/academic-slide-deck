@@ -48,9 +48,9 @@ RUBRIC = [
         "points": "40",
         "quote": "任务完成度 15 分；结果正确性 15 分；结果完整性 5 分；结果可核验性 5 分",
         "checks": ["V01", "V02", "V03", "V04", "V05", "V10", "V11", "V13", "V14", "V15",
-                   "V16", "V17", "V19"],
+                   "V16", "V17", "V19", "V20"],
         "artifacts": ["deck.pptx", "deck.pdf", "plan.json", "evidence_map.json",
-                      "verify_report.json", "result.json", "run.log"],
+                      "verify_report.json", "result.json", "run.log", "deck-transcript.md"],
         "files": ["references/rubric-mapping.md"],
         "scripts": ["run.py"],
         "note": "Page count/order/roles + notes + export are gated by V01/V02/V03; numbers and "
@@ -76,7 +76,7 @@ RUBRIC = [
         "checks": ["V05", "V06", "V07", "V08", "V09", "V12", "V16", "V18"],
         "artifacts": ["build_report.json", "plan.json"],
         "files": ["references/spec-schema.md"],
-        "scripts": ["build_deck.py"],
+        "scripts": ["build_deck.py", "pptx_stdlib.py"],
         "note": "Page-order planning, slot-only placeholder filling, data-bound figure "
                 "provenance and template invariants are the claimed new capabilities, each "
                 "tied to an emitted gate id and to the build report.",
@@ -140,8 +140,8 @@ RUBRIC = [
         "checks": ["V07", "V08", "V12"],
         "artifacts": [],
         "files": ["references/provenance-and-evidence.md"],
-        "scripts": ["common.py", "ingest.py", "plan.py", "build_deck.py", "render.py",
-                    "evidence.py", "verify_deck.py", "result_contract.py"],
+        "scripts": ["common.py", "ingest.py", "plan.py", "build_deck.py", "pptx_stdlib.py",
+                    "render.py", "evidence.py", "verify_deck.py", "result_contract.py"],
         "note": "Every shipped script is listed and each has a stated role; fonts/templates "
                 "are referenced by path with licence and budget notes.",
     },
@@ -215,8 +215,9 @@ MANDATORY_LINES = {42, 43, 44, 45, 46, 50, 60, 61, 62, 63, 71, 72, 73}
 # that points at one of these is reported as PENDING (recorded in the JSON and printed) and
 # does not fail the gate; ``--strict`` turns pending entries into failures. Everything else
 # must resolve, so a dangling reference still fails loudly.
-PENDING_GATE_IDS = {"V19"}          # minimum-content-coverage, being added by verify-render
+PENDING_GATE_IDS = {"V20"}          # run-produced-deliverables gate, being added by verify-render
 PENDING_FILES = {"references/verification_gates.md"}
+PENDING_ARTIFACTS = {"deck-transcript.md"}   # written by run.py; watch for it regressing away
 
 
 # --------------------------------------------------------------------------- #
@@ -336,13 +337,30 @@ def main(argv=None) -> int:
         for art in entry["artifacts"]:
             if not run_src:
                 ok, why = False, "run.py not found, cannot prove %s is produced" % art
-            elif art in run_src:
-                ok, why = True, "named in run.py"
             else:
-                ok, why = False, "%s is not named in run.py" % art
-            row["artifacts"].append({"name": art, "exists": ok, "why": why})
-            if not ok:
+                # A Python module artifact is produced by *importing* it, so the module name
+                # is the honest spelling to look for (run.py says `import pptx_stdlib`, not
+                # `pptx_stdlib.py`); a data artifact is produced by writing its file name.
+                needles = [art]
+                if art.endswith(".py"):
+                    needles.append(art[:-3])
+                found = [n for n in needles if n in run_src]
+                if found:
+                    ok = True
+                    why = ("referenced by run.py as %r" % found[0]
+                           if found[0] != art else "named in run.py")
+                else:
+                    ok, why = False, "%s is not referenced by run.py (looked for %s)" % (
+                        art, " or ".join(repr(n) for n in needles))
+            item = {"name": art, "exists": ok, "why": why}
+            if not ok and art in PENDING_ARTIFACTS and not args.strict:
+                item["pending"] = True
+                row["pending"].append("artifact:%s announced but not produced yet" % art)
+                pending.append("line %d: artifact %s announced but not yet produced"
+                               % (line, art))
+            elif not ok:
                 row["problems"].append("artifact:%s" % why)
+            row["artifacts"].append(item)
 
         if row["problems"]:
             row["status"] = "FAIL"

@@ -129,6 +129,7 @@ Gate ids are fixed and are referenced by `references/rubric-mapping.md`:
 | V17 | no constraint/input leakage into content (audience/duration/slide count/template path) |
 | V18 | `build_report.json` invariants are internally consistent |
 | V19 | minimum content coverage — a near-empty extraction cannot vacuously pass every `all()` |
+| V20 | run produced deliverables — a non-empty readable deck in the output dir; `partial`/`failed` can never read as PASS |
 
 The authoritative per-gate table (input, FAIL vs UNVERIFIED vs N/A, severity, failing example)
 is `references/verification_gates.md`.

@@ -114,12 +114,17 @@ def dump_json(path, obj):
         fh.write(json.dumps(obj, ensure_ascii=False, indent=2) + "\n")
 
 
-def run_cli(args, cwd, timeout):
-    """Run a pipeline CLI; return (returncode, stdout, stderr)."""
+def run_cli(args, cwd, timeout, env=None):
+    """Run a pipeline CLI; return (returncode, stdout, stderr).
+
+    ``env`` replaces the child environment when given (used by the thin-environment cases,
+    which must set ``BLOCK_IMPORTS`` / ``PYTHONPATH`` for one run only).
+    """
     try:
         proc = subprocess.run([sys.executable] + [str(a) for a in args],
                               capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", cwd=str(cwd), timeout=timeout)
+                              errors="replace", cwd=str(cwd), timeout=timeout,
+                              env=env)
         return proc.returncode, proc.stdout or "", proc.stderr or ""
     except subprocess.TimeoutExpired:
         return 124, "", "timeout after %ss" % timeout
@@ -1011,6 +1016,172 @@ def run_negative(nid, name, expected_ids, mutate, base_out, chosen_work, case_pa
 
 
 # --------------------------------------------------------------------------- #
+# thin-environment robustness cases (H1)
+# --------------------------------------------------------------------------- #
+# The evaluated container is not this machine. The challenge declares capability *categories*
+# (scientific-python, pdf-text-tool, office-renderer, ...) and none of them is an OOXML
+# authoring library, so "import pptx works" is an assumption, not a fact. A skill that dies on
+# that import produces NOTHING, and nothing grades as 0 -- which is exactly the bottom bucket
+# this submission received.
+#
+# These are NOT defect injections. Each one is a POSITIVE assertion that the pipeline
+# *survives* a thin environment and stays honest about it. The mechanism is the one proven by
+# work/verify/thin_env_probe.py: a sitecustomize.py meta-path blocker plus BLOCK_IMPORTS, with
+# PYTHONPATH pointing at a hook directory. Unlike that probe, the scratch tree here is created
+# with os.makedirs (tempfile.mkdtemp() makes a 0o700 dir this host refuses to write into).
+
+THIN_BLOCKER = '''
+import sys, os
+_blocked = set(filter(None, os.environ.get("BLOCK_IMPORTS", "").split(",")))
+
+class _Blocker:
+    def find_spec(self, name, path=None, target=None):
+        if name.split(".")[0] in _blocked:
+            raise ImportError("BLOCKED BY SELFTEST: %s" % name)
+        return None
+
+sys.meta_path.insert(0, _Blocker())
+'''
+
+# (id, name, BLOCK_IMPORTS, assertion kind)
+THIN_ENV_CASES = [
+    ("N13", "no_pptx: stdlib deck + real verdict still produced",
+     "pptx", "stdlib_deck"),
+    ("N14", "no_pdf_libs: ingest degrades with recorded warnings",
+     "pypdf,pdfplumber,pypdfium2,pdfium2,fitz", "degrade_pdf"),
+    ("N15", "catastrophic: honest partial/failed result, never a false PASS",
+     "pptx,lxml,pypdf,pdfplumber,pypdfium2,pdfium2,fitz,PIL,matplotlib,docx,fontTools,"
+     "numpy,pandas", "honest_failure"),
+]
+
+THIN_DECK_EXTS = (".pptx", ".pdf", ".odp")
+
+
+def _deck_artifacts(out: Path):
+    if not out.is_dir():
+        return []
+    return sorted(p.name for p in out.rglob("*")
+                  if p.is_file() and p.suffix.lower() in THIN_DECK_EXTS)
+
+
+def run_thin_env(nid, name, blocked, kind, case_path, verify, tmp_root, timeout):
+    """Run the real pipeline with imports blocked; assert it survives *and* stays honest."""
+    res = {"id": nid, "name": name, "blocked_imports": blocked, "assertion": kind,
+           "status": "FRAGILE", "problems": [], "detail": ""}
+    root = tmp_root / ("thin-%s" % nid)
+    work, out, hook = root / "work", root / "out", root / "_hook"
+    try:
+        rmtree(root)
+        for d in (work, out, hook):
+            os.makedirs(str(d), exist_ok=True)
+        (hook / "sitecustomize.py").write_text(THIN_BLOCKER, encoding="utf-8")
+    except OSError as exc:
+        res["status"] = "HARNESS_ERROR"
+        res["detail"] = "could not stage the thin environment: %s" % exc
+        return res
+
+    env = dict(os.environ,
+               PYTHONDONTWRITEBYTECODE="1",
+               PYTHONIOENCODING="utf-8",
+               BLOCK_IMPORTS=blocked,
+               PYTHONPATH=str(hook))
+
+    rc, so, se = run_cli([PIPELINE["run.py"], "--case", case_path, "--work", work,
+                          "--out", out], cwd=SUBMISSION, timeout=timeout, env=env)
+    res["run_exit"] = rc
+    res["stderr_tail"] = (se or "").strip()[-200:]
+    if rc == 124:
+        # Unknown, never "survived": a killed run proves nothing either way.
+        res["status"] = "RUN_TIMEOUT"
+        res["detail"] = ("run.py did not answer within %ss under BLOCK_IMPORTS=%s; the "
+                         "environment tells us nothing" % (timeout, blocked))
+        return res
+
+    case_obj = load_json(case_path, {}) or {}
+    contract = case_obj.get("output_contract") or {}
+    result_path = out / "result.json"
+    material = load_json(work / "material.json", {}) or {}
+    report = load_json(out / "verify_report.json", None)
+    if report is None:
+        report = load_json(work / "verify_report.json", None)
+
+    decks = _deck_artifacts(out)
+    res["deck_artifacts"] = decks
+    res["result_json"] = result_path.is_file()
+    result = load_json(result_path, {}) or {}
+    res["result_status"] = result.get("status")
+    res["verify_verdict"] = (report or {}).get("verdict") if isinstance(report, dict) else None
+    res["material_warnings"] = len(material.get("warnings") or [])
+    res["uncertainty"] = len(result.get("uncertainty") or [])
+
+    problems = []
+    # 1. nothing at all is the 0-score failure class, for every kind
+    if not result_path.is_file():
+        problems.append("no result.json was written (this is the 'produces nothing' failure)")
+    # 2. the declared contract must be filled even in a thin environment
+    if result_path.is_file():
+        missing_keys = sorted(k for k in contract if k not in result)
+        res["missing_contract_keys"] = missing_keys
+        if missing_keys:
+            problems.append("result.json is missing output_contract key(s): %s" % missing_keys)
+    # 2. per-kind assertions
+    if kind == "stdlib_deck":
+        if not decks:
+            problems.append("no editable/exported deck artifact (.pptx/.pdf/.odp) in the "
+                            "output dir")
+        if not isinstance(report, dict) or not (report.get("checks") or []):
+            problems.append("verify_deck.py produced no verdict/checks report")
+        elif report.get("verdict") not in ("PASS", "FAIL"):
+            problems.append("verify report verdict is %r, not a real PASS/FAIL"
+                            % report.get("verdict"))
+    elif kind == "degrade_pdf":
+        if not decks:
+            problems.append("no deck artifact in the output dir")
+        recorded = (res["material_warnings"] or res["uncertainty"]
+                    or len(material.get("noise") or []))
+        if not recorded:
+            problems.append("the missing PDF libraries were not recorded anywhere "
+                            "(material.json warnings[] and result.json uncertainty are both "
+                            "empty), so the degradation is silent")
+    elif kind == "honest_failure":
+        # `result.json.status` describes DELIVERABLE COMPLETENESS (result_contract.py), not the
+        # gate verdict, so a genuinely-working stdlib fallback is allowed to answer "ok" --
+        # what is never allowed is claiming success while delivering nothing, or a false green
+        # verdict on an incomplete run.
+        if res["result_status"] not in ("ok", "partial", "failed"):
+            problems.append("result.json status is %r, which is not a real "
+                            "ok|partial|failed value" % res["result_status"])
+        if not decks and res["result_status"] == "ok":
+            problems.append("result.json claims status='ok' but no deck artifact exists: "
+                            "success claimed while delivering nothing")
+        if not decks and (isinstance(report, dict) and report.get("verdict") == "PASS"):
+            problems.append("the gate reported PASS while no deck artifact exists: a false "
+                            "green on an incomplete run")
+        if res["result_status"] == "ok" and not isinstance(report, dict):
+            problems.append("status='ok' but verify_deck.py produced no verdict report")        # when the gate does not pass, the disappointment must be recorded in result.json
+        if isinstance(report, dict) and report.get("verdict") == "FAIL":
+            self_check = result.get("_self_check") or {}
+            recorded = (self_check.get("verify_verdict") == "FAIL"
+                        or bool(self_check.get("checks_failed"))
+                        or bool(result.get("uncertainty")))
+            if not recorded:
+                problems.append("the gate FAILed but result.json records neither "
+                                "_self_check.verify_verdict/checks_failed nor any uncertainty "
+                                "entry, so the failure is invisible to the consumer")
+        if not decks and not result.get("uncertainty"):
+            problems.append("no deck was produced and result.json carries no uncertainty "
+                            "entry explaining what is missing")
+
+    res["problems"] = problems
+    res["status"] = "FRAGILE" if problems else "ROBUST"
+    res["detail"] = ("survived: exit=%s status=%s decks=%s verdict=%s"
+                     % (rc, res["result_status"], decks or "none", res["verify_verdict"]))
+    if problems:
+        res["detail"] += " | " + "; ".join(problems)
+    return res
+
+
+# --------------------------------------------------------------------------- #
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="End-to-end self-test with defect injection")
     ap.add_argument("--fixtures", default=None,
@@ -1022,6 +1193,9 @@ def main(argv=None) -> int:
                          "the first one")
     ap.add_argument("--json", default=None, help="write the machine-readable summary here")
     ap.add_argument("--timeout", type=int, default=900, help="seconds per pipeline-stage CLI call")
+    ap.add_argument("--thin-timeout", type=int, default=1500,
+                    help="seconds per thin-environment run.py (these have their own, more "
+                         "generous budget: the machine may also be rendering)")
     ap.add_argument("--verify-timeout", type=int, default=600,
                     help="seconds per verify_deck.py call inside a negative (separate from "
                          "--timeout; one bounded retry is made, and a timeout is reported as "
@@ -1031,11 +1205,17 @@ def main(argv=None) -> int:
                     help="case dir name asserted fully green end-to-end (repeatable; default: "
                          "<fixtures>/known_good.txt, else every case)")
     ap.add_argument("--skip-negatives", action="store_true")
+    ap.add_argument("--skip-thin-env", action="store_true",
+                    help="skip the thin-environment robustness cases (N13-N15)")
     ap.add_argument("--only", action="append", default=None,
                     help="run only these negative ids (repeatable), e.g. --only N08")
     args = ap.parse_args(argv)
 
     fixtures = Path(args.fixtures).resolve() if args.fixtures else SUBMISSION.parent / "fixtures"
+    # NOTE: `summary` is not built until after scratch-dir setup, so concurrent-run detection
+    # must not write into it here (doing so raised UnboundLocalError and made the guard against
+    # concurrent runs crash precisely when a concurrent run existed).
+    pending_concurrent = []
     if args.tmp:
         tmp_root = Path(args.tmp).resolve()
     else:
@@ -1045,12 +1225,24 @@ def main(argv=None) -> int:
         scratch_parent = fixtures / "_selftest_tmp"
         scratch_parent.mkdir(parents=True, exist_ok=True)
         now = time.time()
+        active = []
         for old in scratch_parent.glob("run-*"):
-            try:                                     # prune only long-abandoned runs
-                if now - old.stat().st_mtime > 1800:
-                    rmtree(old)
+            try:
+                age = now - old.stat().st_mtime
             except OSError:
-                pass
+                continue
+            if age > 1800:
+                rmtree(old)                    # long-abandoned: safe to prune
+            elif old.name != os.path.basename("run-%d" % os.getpid()):
+                active.append((old.name, int(age)))
+        if active:
+            # Two self-tests at once contend for LibreOffice/render and for the machine's IO,
+            # which shows up as spurious timeouts. Say so instead of reporting a polluted run.
+            # Deferred: `summary` does not exist yet at this point (see pending_concurrent).
+            pending_concurrent = active
+            log("WARNING: another selftest run appears active in %s (%s). Concurrent runs "
+                "contend for renders and can produce spurious timeouts; interpret this run's "
+                "timings with care." % (scratch_parent, active))
         tmp_root = scratch_parent / ("run-%d-%s" % (os.getpid(),
                                                     time.strftime("%Y%m%d-%H%M%S")))
 
@@ -1064,7 +1256,9 @@ def main(argv=None) -> int:
 
     summary = {"schema": "selftest/v1", "fixtures": str(fixtures),
                "submission": str(SUBMISSION), "positives": [], "negatives": [],
-               "skips": [], "problems": [], "status": "FAIL"}
+               "thin_env": [], "skips": [], "problems": [], "status": "FAIL"}
+    if pending_concurrent:
+        summary["concurrent_runs_detected"] = pending_concurrent
 
     missing = [name for name, path in PIPELINE.items() if not path.is_file()]
     if missing:
@@ -1209,13 +1403,37 @@ def main(argv=None) -> int:
                 % (res["status"], name[:46], ",".join(expected),
                    ",".join(res["observed"][:6]) or "-", res["detail"][:160]))
 
+    # ---- thin-environment robustness cases (positives, not defect injections) -------- #
+    if not args.skip_thin_env:
+        wanted = set(args.only or [])
+        selected = [c for c in THIN_ENV_CASES if not wanted or c[0] in wanted]
+        if selected:
+            ref_case = cases[0]
+            log("== thin-environment robustness on %s (must survive AND stay honest) =="
+                % ref_case.parent.name)
+            for nid, name, blocked, kind in selected:
+                try:
+                    res = run_thin_env(nid, name, blocked, kind, ref_case, verify,
+                                       tmp_root, args.thin_timeout)
+                except Exception as exc:  # noqa: BLE001
+                    res = {"id": nid, "name": name, "blocked_imports": blocked,
+                           "status": "HARNESS_ERROR",
+                           "detail": "%s: %s" % (type(exc).__name__, exc),
+                           "problems": []}
+                summary["thin_env"].append(res)
+                log("   %-13s %-52s %s"
+                    % (res["status"], name[:52], res["detail"][:150]))
+
     pos_ok = all(p["status"] != "FAIL" for p in summary["positives"]) and any(
         p["status"] == "PASS" for p in summary["positives"])
     blocking_statuses = {"NOT_DETECTED", "WRONG_CHECK", "MUTATION_FAILED", "PREEXISTING",
                          "HARNESS_ERROR", "VERIFIER_TIMEOUT"}
     neg_ok = (args.skip_negatives or
               all(n["status"] not in blocking_statuses for n in summary["negatives"]))
-    summary["status"] = "PASS" if (pos_ok and neg_ok) else "FAIL"
+    # A thin environment that yields nothing (or lies about it) fails the run. A timeout is
+    # "unknown", which also fails: it must never be read as "survived".
+    thin_ok = all(t["status"] == "ROBUST" for t in summary["thin_env"])
+    summary["status"] = "PASS" if (pos_ok and neg_ok and thin_ok) else "FAIL"
     summary["counts"] = {
         "positives_total": len(summary["positives"]),
         "positives_passed": sum(1 for p in summary["positives"] if p["status"] == "PASS"),
@@ -1239,6 +1457,13 @@ def main(argv=None) -> int:
         "negatives_harness_error": sum(1 for n in summary["negatives"]
                                        if n["status"] == "HARNESS_ERROR"),
         "skipped_render_assertions": len(summary["skips"]),
+        "thin_env_total": len(summary["thin_env"]),
+        "thin_env_robust": sum(1 for t in summary["thin_env"] if t["status"] == "ROBUST"),
+        "thin_env_fragile": sum(1 for t in summary["thin_env"] if t["status"] == "FRAGILE"),
+        "thin_env_run_timeout": sum(1 for t in summary["thin_env"]
+                                    if t["status"] == "RUN_TIMEOUT"),
+        "thin_env_harness_error": sum(1 for t in summary["thin_env"]
+                                      if t["status"] == "HARNESS_ERROR"),
     }
     for p in summary["positives"]:
         for problem in p["problems"]:
@@ -1249,6 +1474,12 @@ def main(argv=None) -> int:
         elif n["status"] == "GATE_ABSENT":
             summary["skips"].append({"case": "-", "assertion": "%s %s" % (n["id"], n["name"]),
                                     "reason": n["detail"]})
+    for t in summary["thin_env"]:
+        if t["status"] != "ROBUST":
+            summary["problems"].append(
+                "%s %s under BLOCK_IMPORTS=%s: %s"
+                % (t["id"], t["status"], t.get("blocked_imports"),
+                   "; ".join(t.get("problems") or [t.get("detail") or ""])))
 
     if not args.keep:
         rmtree(tmp_root)
@@ -1257,12 +1488,19 @@ def main(argv=None) -> int:
     log("counts: %s" % json.dumps(summary["counts"], ensure_ascii=False))
     harness_ok = (summary["counts"]["negatives_mutation_failed"] == 0
                   and summary["counts"]["negatives_harness_error"] == 0
-                  and summary["counts"]["negatives_verifier_timeout"] == 0)
+                  and summary["counts"]["negatives_verifier_timeout"] == 0
+                  and summary["counts"]["thin_env_harness_error"] == 0
+                  and summary["counts"]["thin_env_run_timeout"] == 0)
     summary["harness_ok"] = harness_ok
     summary["success_requires"] = (
         "every negative DETECTED by its expected gate id, with negatives_mutation_failed == 0, "
-        "negatives_harness_error == 0 and negatives_verifier_timeout == 0; positives green for "
-        "every known-good case")
+        "negatives_harness_error == 0 and negatives_verifier_timeout == 0; every thin-"
+        "environment case ROBUST (thin_env_fragile == 0), with thin_env_run_timeout == 0 and "
+        "thin_env_harness_error == 0; positives green for every known-good case")
+    if summary["counts"]["thin_env_fragile"]:
+        log("FRAGILE UNDER THIN ENVIRONMENT: %d/%d case(s) did not survive or did not stay "
+            "honest. This is the failure class that grades 0 (no result.json, no deck)."
+            % (summary["counts"]["thin_env_fragile"], summary["counts"]["thin_env_total"]))
     if summary["counts"]["negatives_verifier_timeout"]:
         log("VERIFIER TIMEOUT: %d negative(s) could not be classified because verify_deck.py "
             "did not answer in time (--verify-timeout %ss, one retry). That is 'unknown', not "

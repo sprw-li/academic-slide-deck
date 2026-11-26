@@ -153,7 +153,7 @@ Measured behaviour per renderer is in `references/exports-fonts-colour.md`.
 
 ## 8. Self-check and what it does *not* certify
 
-`verify_report.json` carries gates **V01–V19** (see `references/verification_gates.md` for the
+`verify_report.json` carries gates **V01–V20** (see `references/verification_gates.md` for the
 authoritative per-gate table). `verdict = PASS` requires **zero `FAIL` and
 zero `UNVERIFIED`**; a `SKIP` is allowed only with a recorded reason. A check that could not
 actually inspect its target reports `UNVERIFIED` — which fails the gate on purpose. The gate

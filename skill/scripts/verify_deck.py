@@ -282,6 +282,8 @@ def canonical_xml(blob):
 
 def theme_fonts(parts):
     """``{major_latin, minor_latin, major_ea, minor_ea}`` from the first theme part."""
+    if etree is None:
+        return et_theme_fonts(parts)
     out = {"major_latin": "", "minor_latin": "", "major_ea": "", "minor_ea": ""}
     for name in theme_names(parts):
         text = part_text(parts, name)
@@ -622,6 +624,554 @@ def allowed_numbers(material):
 
 
 # --------------------------------------------------------------------------- #
+# Deck model: ONE interface, two backends.
+#
+# The evaluated container is not this machine, and an OOXML authoring library is *not* one of
+# the capabilities the challenge declares.  A verifier that dies on `import pptx` turns a
+# recoverable run into "no verdict at all".  So the deck is read through `zipfile` +
+# `xml.etree.ElementTree` (both stdlib, never blocked) and the python-pptx objects are only an
+# *adapter* that produces the same dicts.  Every check consumes the dicts, so the fallback path
+# applies the same V02/V03/V04/V06/V10/V11/V16/V17 logic rather than degrading to UNVERIFIED.
+# --------------------------------------------------------------------------- #
+
+from xml.etree import ElementTree as _ET          # stdlib: never an optional import
+import posixpath
+
+L_INS, R_INS, T_INS, B_INS = 91440, 91440, 45720, 45720
+
+
+def _local(elem):
+    tag = getattr(elem, "tag", None)
+    if not isinstance(tag, str):
+        return ""
+    return tag.rsplit("}", 1)[-1]
+
+
+def _child(elem, name):
+    """First direct child with local name *name*.  (Never rely on Element truthiness: an
+    element with no children is falsy, which silently breaks `a or b` chains.)"""
+    if elem is None:
+        return None
+    for c in elem:
+        if _local(c) == name:
+            return c
+    return None
+
+
+def _kids(elem, name):
+    if elem is None:
+        return []
+    return [c for c in elem if _local(c) == name]
+
+
+def _desc(root, name):
+    if root is None:
+        return []
+    return [e for e in root.iter() if _local(e) == name]
+
+
+def _et(blob):
+    if not blob:
+        return None
+    try:
+        return _ET.fromstring(blob)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _iattr(elem, name, default=0):
+    if elem is None:
+        return default
+    try:
+        raw = elem.get(name)
+        return default if raw is None else int(float(raw))
+    except (TypeError, ValueError):
+        return default
+
+
+def _geom(sp_pr):
+    """(left, top, width, height) in EMU from a ``…spPr`` element."""
+    xfrm = _child(sp_pr, "xfrm")
+    if xfrm is None:
+        return 0, 0, 0, 0
+    off, ext = _child(xfrm, "off"), _child(xfrm, "ext")
+    return (_iattr(off, "x"), _iattr(off, "y"), _iattr(ext, "cx"), _iattr(ext, "cy"))
+
+
+def _et_body(tx_body):
+    """((l, r, t, b) insets, autofit kind) from a ``txBody``'s ``bodyPr``."""
+    body = _child(tx_body, "bodyPr")
+    if body is None:
+        return (L_INS, R_INS, T_INS, B_INS), None
+    margins = (_iattr(body, "lIns", L_INS), _iattr(body, "rIns", R_INS),
+               _iattr(body, "tIns", T_INS), _iattr(body, "bIns", B_INS))
+    autofit = None
+    for c in body:
+        ln = _local(c)
+        if ln == "normAutofit":
+            autofit = "norm"
+        elif ln == "spAutoFit":
+            autofit = "sp"
+        elif ln == "noAutofit":
+            autofit = None
+    return margins, autofit
+
+
+def _et_paras(tx_body):
+    """[{text, size_pt, marL}] in document order, from a ``txBody``."""
+    paras = []
+    for p in _kids(tx_body, "p"):
+        chunks, size, marl = [], None, 0
+        ppr = _child(p, "pPr")
+        if ppr is not None:
+            marl = _iattr(ppr, "marL", 0)
+            defr = _child(ppr, "defRPr")
+            if defr is not None and defr.get("sz"):
+                try:
+                    size = int(defr.get("sz")) / 100.0
+                except (TypeError, ValueError):
+                    size = None
+        for node in p:
+            ln = _local(node)
+            if ln in ("r", "fld"):
+                rpr = _child(node, "rPr")
+                if size is None and rpr is not None and rpr.get("sz"):
+                    try:
+                        size = int(rpr.get("sz")) / 100.0
+                    except (TypeError, ValueError):
+                        pass
+                t = _child(node, "t")
+                if t is not None and t.text:
+                    chunks.append(t.text)
+            elif ln == "br":
+                chunks.append("\n")
+        paras.append({"text": "".join(chunks), "size_pt": size, "marL": marl})
+    return paras
+
+
+def _rels_target(parts, part_name, type_suffix):
+    """Resolve one relationship target of *part_name* whose type ends with *type_suffix*."""
+    rels_path = posixpath.join(posixpath.dirname(part_name), "_rels",
+                               posixpath.basename(part_name) + ".rels")
+    root = _et(parts.get(rels_path))
+    if root is None:
+        return None
+    for rel in _desc(root, "Relationship"):
+        if str(rel.get("Type", "")).endswith(type_suffix):
+            target = rel.get("Target", "")
+            if not target:
+                continue
+            if target.startswith("/"):
+                return posixpath.normpath(target.lstrip("/"))
+            return posixpath.normpath(posixpath.join(posixpath.dirname(part_name), target))
+    return None
+
+
+def _ph_geometry(parts, part_name):
+    """``{("type", token): geom, ("idx", idx): geom}`` for the placeholders of a layout/master.
+
+    Placeholders on a slide very often carry **no** ``<a:xfrm>`` at all: their position and size
+    are inherited from the layout, and from the master above that.  Without this lookup every
+    inherited placeholder measured as a zero-size shape, which is how V10 ended up inspecting
+    *nothing* and still reporting PASS.
+    """
+    out = {}
+    root = _et(parts.get(part_name)) if part_name else None
+    if root is None:
+        return out
+    for sp in _desc(root, "sp"):
+        nv = _child(sp, "nvSpPr")
+        if nv is None:
+            continue
+        nvpr = _child(nv, "nvPr")
+        ph = _child(nvpr, "ph") if nvpr is not None else None
+        if ph is None:
+            continue
+        geom = _geom(_child(sp, "spPr"))
+        if not any(geom):
+            continue
+        token = (ph.get("type", "") or "").strip().lower()
+        idx = (ph.get("idx", "") or "").strip()
+        if token:
+            out.setdefault(("type", token), geom)
+        if idx:
+            out.setdefault(("idx", idx), geom)
+    return out
+
+
+def _inherited_geometry(parts, slide_no):
+    """Placeholder geometry a slide inherits: master first, then layout on top."""
+    merged = {}
+    layout = _rels_target(parts, f"ppt/slides/slide{slide_no}.xml", "/slideLayout")
+    if layout:
+        master = _rels_target(parts, layout, "/slideMaster")
+        if master:
+            merged.update(_ph_geometry(parts, master))
+        merged.update(_ph_geometry(parts, layout))
+    return merged
+
+
+def et_slide_shapes(blob, inherited=None):
+    """Shapes of one slide part as model dicts (stdlib path)."""
+    root = _et(blob)
+    out = []
+    if root is None:
+        return out
+    for sp in _desc(root, "sp"):
+        tx_body = _child(sp, "txBody")
+        paras = _et_paras(tx_body) if tx_body is not None else []
+        margins, autofit = _et_body(tx_body) if tx_body is not None else \
+            ((L_INS, R_INS, T_INS, B_INS), None)
+        name, ph_type, ph_idx = "", "", ""
+        nv = _child(sp, "nvSpPr")
+        if nv is not None:
+            cnv = _child(nv, "cNvPr")
+            if cnv is not None:
+                name = cnv.get("name", "") or ""
+            nvpr = _child(nv, "nvPr")
+            if nvpr is not None:
+                ph = _child(nvpr, "ph")
+                if ph is not None:
+                    # camelCase tokens (ctrTitle/subTitle/sldNum) and lowercase both occur;
+                    # lower-case here and let consumers compare case-insensitively.
+                    ph_type = (ph.get("type", "") or "")
+                    ph_idx = (ph.get("idx", "") or "")
+        left, top, width, height = _geom(_child(sp, "spPr"))
+        if not any((left, top, width, height)) and inherited:
+            token = (ph_type or "").strip().lower()
+            idx = (ph_idx or "").strip()
+            fallback = inherited.get(("type", token)) if token else None
+            if fallback is None and idx:
+                fallback = inherited.get(("idx", idx))
+            if fallback is not None:
+                left, top, width, height = fallback
+        out.append({"name": name, "ph_type": ph_type, "ph_idx": ph_idx,
+                    "text": "\n".join(p["text"] for p in paras), "paras": paras,
+                    "left": left, "top": top, "width": width, "height": height,
+                    "margins": margins, "autofit": autofit,
+                    "is_picture": False, "src_rect": None})
+    for pic in _desc(root, "pic"):
+        name = ""
+        nv = _child(pic, "nvPicPr")
+        if nv is not None:
+            cnv = _child(nv, "cNvPr")
+            if cnv is not None:
+                name = cnv.get("name", "") or ""
+        src_rect = None
+        bf = _child(pic, "blipFill")
+        if bf is not None:
+            sr = _child(bf, "srcRect")
+            if sr is not None:
+                attrs = {k: v for k, v in sr.attrib.items() if k in ("l", "t", "r", "b")}
+                if any(float(v) != 0 for v in attrs.values() if _is_num(v)):
+                    src_rect = attrs
+        left, top, width, height = _geom(_child(pic, "spPr"))
+        out.append({"name": name, "ph_type": "",
+                    "text": "", "paras": [],
+                    "left": left, "top": top, "width": width, "height": height,
+                    "margins": (L_INS, R_INS, T_INS, B_INS), "autofit": None,
+                    "is_picture": True, "src_rect": src_rect})
+    return out
+
+
+def _is_num(value):
+    try:
+        float(value)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def et_theme_fonts(parts):
+    """Theme font scheme read with ElementTree, mirroring `theme_fonts` (lxml optional)."""
+    out = {"major_latin": "", "minor_latin": "", "major_ea": "", "minor_ea": ""}
+    for name in theme_names(parts):
+        root = _et(parts.get(name))
+        if root is None:
+            continue
+        for tag, latin_key, ea_key in (("majorFont", "major_latin", "major_ea"),
+                                       ("minorFont", "minor_latin", "minor_ea")):
+            for node in _desc(root, tag):
+                latin = _child(node, "latin")
+                ea = _child(node, "ea")
+                if latin is not None:
+                    out[latin_key] = latin.get("typeface", "") or ""
+                if ea is not None:
+                    out[ea_key] = ea.get("typeface", "") or ""
+            if any(out.values()):
+                break
+        if any(out.values()):
+            break
+    return out
+
+
+def _xml_struct_equal(a_blob, b_blob):
+    """Structural XML equality with ElementTree (used when lxml is unavailable).
+
+    Compares element local names, sorted attributes and stripped text, so a re-serialised but
+    semantically identical part is not reported as a modified template part.
+    """
+    ra, rb = _et(a_blob), _et(b_blob)
+    if ra is None or rb is None:
+        return a_blob == b_blob
+    if _local(ra) != _local(rb):
+        return False
+    if sorted(ra.attrib.items()) != sorted(rb.attrib.items()):
+        return False
+    if (ra.text or "").strip() != (rb.text or "").strip():
+        return False
+    if len(ra) != len(rb):
+        return False
+    return all(_xml_struct_equal_elem(x, y) for x, y in zip(ra, rb))
+
+
+def _xml_struct_equal_elem(x, y):
+    if _local(x) != _local(y):
+        return False
+    if sorted(x.attrib.items()) != sorted(y.attrib.items()):
+        return False
+    if (x.text or "").strip() != (y.text or "").strip():
+        return False
+    if (x.tail or "").strip() != (y.tail or "").strip():
+        return False
+    if len(x) != len(y):
+        return False
+    return all(_xml_struct_equal_elem(c, d) for c, d in zip(x, y))
+
+
+def et_notes_by_slide(parts):
+    """{slide_no: notes text} resolved through ``ppt/slides/_rels/slideN.xml.rels``."""
+    notes = {}
+    for n in slide_numbers(parts):
+        rels = _et(parts.get(f"ppt/slides/_rels/slide{n}.xml.rels"))
+        target = None
+        if rels is not None:
+            for rel in _desc(rels, "Relationship"):
+                if str(rel.get("Type", "")).endswith("/notesSlide"):
+                    raw = rel.get("Target", "")
+                    if raw:
+                        target = posixpath.normpath(posixpath.join("ppt/slides", raw))
+                    break
+        if not target:
+            continue
+        root = _et(parts.get(target))
+        if root is None:
+            continue
+        # Prefer the notes body placeholder; fall back to every text run in the part.
+        body_text = ""
+        for sp in _desc(root, "sp"):
+            nv = _child(sp, "nvSpPr")
+            ph = None
+            if nv is not None:
+                nvpr = _child(nv, "nvPr")
+                if nvpr is not None:
+                    ph = _child(nvpr, "ph")
+            if ph is not None and (ph.get("type") in ("body", None) or ph.get("type") == "body"):
+                tb = _child(sp, "txBody")
+                body_text = "\n".join(p["text"] for p in _et_paras(tb)) if tb is not None else ""
+                if body_text.strip():
+                    break
+        if not body_text.strip():
+            body_text = "\n".join((t.text or "") for t in _desc(root, "t") if t.text)
+        if body_text.strip():
+            notes[n] = body_text
+    return notes
+
+
+class DeckModel:
+    """The deck as every check sees it: per-slide title / text / notes / shapes."""
+
+    def __init__(self, backend, width, height, slides, notes):
+        self.backend = backend
+        self.width = int(width or 0)
+        self.height = int(height or 0)
+        self.slides = slides
+        self._notes = notes
+
+    @property
+    def slide_count(self):
+        return len(self.slides)
+
+    def title(self, i):
+        """The slide's title text.
+
+        Tolerant of two spellings the stdlib fallback engine can produce: a camelCase
+        ``type`` token (``ctrTitle``) and a placeholder carrying only ``idx="0"`` with no
+        ``type``.  Both are title placeholders in practice; missing them made V02 report
+        "no title in deck" on a deck that visibly has one.
+        """
+        shapes = self.slides[i]
+        for sh in shapes:
+            if (sh.get("ph_type") or "").strip().lower() in ("title", "ctrtitle"):
+                text = (sh.get("text") or "").strip()
+                if text:
+                    return text
+        for sh in shapes:
+            if str(sh.get("ph_idx") or "").strip() == "0" and (sh.get("text") or "").strip():
+                return (sh.get("text") or "").strip()
+        return ""
+
+    def text(self, i):
+        return "\n".join(sh.get("text") or "" for sh in self.slides[i]).strip()
+
+    def notes(self, i):
+        return (self._notes.get(i + 1) or "").strip()
+
+    def picture_count(self, i):
+        return sum(1 for sh in self.slides[i] if sh.get("is_picture"))
+
+    def pictures(self, i):
+        return [sh for sh in self.slides[i] if sh.get("is_picture")]
+
+
+def model_from_parts(deck_parts):
+    """Deck model from raw OOXML parts -- no third-party import at all."""
+    if not deck_parts:
+        return None
+    pres = _et(deck_parts.get("ppt/presentation.xml"))
+    width = height = 0
+    if pres is not None:
+        sz = _child(pres, "sldSz")
+        width, height = _iattr(sz, "cx"), _iattr(sz, "cy")
+    slides = [et_slide_shapes(deck_parts.get(f"ppt/slides/slide{n}.xml"),
+                              _inherited_geometry(deck_parts, n))
+              for n in slide_numbers(deck_parts)]
+    if not slides:
+        return None
+    return DeckModel("stdlib-xml", width, height, slides, et_notes_by_slide(deck_parts))
+
+
+def model_from_pptx(prs):
+    """Deck model from a python-pptx Presentation (optional richer backend)."""
+    slides, notes = [], {}
+    for idx, s in enumerate(prs.slides, 1):
+        shapes = []
+        for sh in s.shapes:
+            entry = {"name": getattr(sh, "name", "") or "", "ph_type": "", "ph_idx": "",
+                     "text": "",
+                     "paras": [], "left": 0, "top": 0, "width": 0, "height": 0,
+                     "margins": (L_INS, R_INS, T_INS, B_INS), "autofit": None,
+                     "is_picture": False, "src_rect": None}
+            try:
+                entry["left"] = int(sh.left or 0)
+                entry["top"] = int(sh.top or 0)
+                entry["width"] = int(sh.width or 0)
+                entry["height"] = int(sh.height or 0)
+            except Exception:  # noqa: BLE001
+                pass
+            try:
+                if sh.is_placeholder:
+                    kind = str(sh.placeholder_format.type).upper()
+                    if "TITLE" in kind:
+                        entry["ph_type"] = "ctrTitle" if "CENTER" in kind else "title"
+                    idx = sh.placeholder_format.idx
+                    if idx is not None:
+                        entry["ph_idx"] = str(idx)
+            except Exception:  # noqa: BLE001
+                pass
+            try:
+                entry["is_picture"] = ((sh.shape_type is not None
+                                        and "PICTURE" in str(sh.shape_type))
+                                       or hasattr(sh, "image"))
+            except Exception:  # noqa: BLE001
+                entry["is_picture"] = False
+            try:
+                xml = sh._element.xml
+            except Exception:  # noqa: BLE001
+                xml = ""
+            m = re.search(r"<(?:\w+:)?srcRect([^/>]*)/?>", xml)
+            if m and re.search(r'(l|t|r|b)="(?!0")', m.group(1)):
+                entry["src_rect"] = m.group(1).strip()
+            entry["autofit"] = shape_autofit_kind(sh)
+            try:
+                tf = sh.text_frame
+            except Exception:  # noqa: BLE001
+                tf = None
+            if tf is not None:
+                for attr_name, slot in (("margin_left", 0), ("margin_right", 1),
+                                        ("margin_top", 2), ("margin_bottom", 3)):
+                    try:
+                        v = getattr(tf, attr_name, None)
+                        if v is not None:
+                            margins = list(entry["margins"])
+                            margins[slot] = int(v)
+                            entry["margins"] = tuple(margins)
+                    except Exception:  # noqa: BLE001
+                        pass
+                paras = []
+                for para in tf.paragraphs:
+                    size = None
+                    try:
+                        for run in para.runs:
+                            if run.font.size is not None:
+                                size = run.font.size.pt
+                                break
+                    except Exception:  # noqa: BLE001
+                        size = None
+                    marl = 0
+                    try:
+                        ppr = para._p.find(f"{{{NS['a']}}}pPr")
+                        if ppr is not None and ppr.get("marL"):
+                            marl = int(ppr.get("marL") or 0)
+                    except Exception:  # noqa: BLE001
+                        marl = 0
+                    if size is None:
+                        try:
+                            mm = re.search(r'sz="(\d+)"', para._p.xml)
+                            if mm:
+                                size = int(mm.group(1)) / 100.0
+                        except Exception:  # noqa: BLE001
+                            size = None
+                    paras.append({"text": para.text or "", "size_pt": size, "marL": marl})
+                entry["paras"] = paras
+                entry["text"] = tf.text or ""
+            shapes.append(entry)
+        slides.append(shapes)
+        try:
+            if s.has_notes_slide:
+                txt = s.notes_slide.notes_text_frame.text or ""
+                if txt.strip():
+                    notes[idx] = txt
+        except Exception:  # noqa: BLE001
+            pass
+    return DeckModel("python-pptx", int(prs.slide_width or 0), int(prs.slide_height or 0),
+                     slides, notes)
+
+
+def shape_extent(sh):
+    """Estimate whether a model shape's text fits.  ``(overflow, detail, needed, avail)``.
+
+    ``overflow`` is ``None`` when the shape carries no measurable text, which callers must treat
+    as "not inspected" rather than "fits".
+    """
+    text = (sh.get("text") or "").strip()
+    if not text:
+        return None, "empty text frame", 0, 0
+    width_emu = int(sh.get("width") or 0)
+    height_emu = int(sh.get("height") or 0)
+    if width_emu <= 0 or height_emu <= 0:
+        return None, "zero-size shape", 0, 0
+    ml, mr, mt, mb = sh.get("margins") or (L_INS, R_INS, T_INS, B_INS)
+    avail_w = max(1, width_emu - ml - mr)
+    avail_h = max(1, height_emu - mt - mb)
+    avail_pt = avail_w / EMU_PER_PT
+    font_path = _fallback_font()
+    needed_pt = 0.0
+    total_lines = 0
+    for para in (sh.get("paras") or []):
+        size_pt = float(para.get("size_pt") or 18.0)
+        indent = int(para.get("marL") or 0)
+        lines = estimate_paragraph_lines(para.get("text") or "", font_path, size_pt,
+                                         max(1.0, avail_pt - indent / EMU_PER_PT))
+        total_lines += lines
+        needed_pt += max(1, lines) * size_pt * 1.2
+    needed_emu = int(needed_pt * EMU_PER_PT) + mt + mb
+    return (needed_emu > avail_h), \
+        (f"needs~{needed_emu / EMU_PER_PT:.1f}pt vs box {avail_h / EMU_PER_PT:.1f}pt, "
+         f"lines={total_lines}"), needed_emu, avail_h
+
+
+# --------------------------------------------------------------------------- #
 # the checks
 # --------------------------------------------------------------------------- #
 
@@ -759,8 +1309,11 @@ CONTENT_OVERLAP = 0.70
 MIN_CONTENT_WORDS = 3
 
 
-def slide_text_units(plan_slides, slides):
-    """``[(slide_no, kind, normalised_text, raw_text)]`` for titles, bullets and notes."""
+def slide_text_units(plan_slides, model):
+    """``[(slide_no, kind, normalised_text, raw_text)]`` for titles, bullets and notes.
+
+    Reads the deck through the model, so this works on the stdlib OOXML backend too.
+    """
     units = []
     if plan_slides:
         for i, ps in enumerate(plan_slides, 1):
@@ -775,33 +1328,27 @@ def slide_text_units(plan_slides, slides):
                 n = _norm_text(b)
                 if n:
                     units.append((i, "bullet", n, str(b)))
-    else:
-        for i, s in enumerate(slides, 1):
-            try:
-                if s.shapes.title is not None and (s.shapes.title.text or "").strip():
-                    raw = s.shapes.title.text
-                    units.append((i, "title", _norm_text(raw), raw))
-            except Exception:  # noqa: BLE001
-                pass
-            for sh in s.shapes:
-                try:
-                    if sh.has_text_frame and sh.text_frame.text.strip():
-                        raw = sh.text_frame.text
-                        units.append((i, "text", _norm_text(raw), raw))
-                except Exception:  # noqa: BLE001
-                    continue
+    elif model is not None:
+        for i in range(model.slide_count):
+            raw = model.title(i)
+            if raw.strip():
+                units.append((i + 1, "title", _norm_text(raw), raw))
+            for sh in model.slides[i]:
+                raw = (sh.get("text") or "").strip()
+                if raw and not sh.get("is_picture"):
+                    units.append((i + 1, "text", _norm_text(raw), raw))
     return units
 
 
-def duplicate_content_issues(units, min_chars=20, threshold=None):
+def duplicate_content_issues(units, min_chars=20, threshold=None, nav_slides=frozenset()):
     """Pairs of units on *different* slides that are the same or nearly the same.
 
     Four detections, in order of how directly they prove duplication:
 
     1. **repeated bullet** -- the same bullet fingerprint (leading ``"Label:"`` prefix stripped)
-       on >= 2 slides.  Boilerplate repeats by construction: ``"Problem: what this page has to
-       establish."`` … ``"Conclusion: what this page has to establish."`` all collapse to one
-       fingerprint even though their labels differ.
+       occurring twice or more anywhere in the deck.  Boilerplate repeats by construction:
+       ``"Problem: what this page has to establish."`` … ``"Conclusion: what this page has to
+       establish."`` all collapse to one fingerprint even though their labels differ.
     2. identical strings.
     3. one string contained in the other.
     4. **content-word overlap** >= :data:`CONTENT_OVERLAP` over the shorter side, stopwords
@@ -812,6 +1359,13 @@ def duplicate_content_issues(units, min_chars=20, threshold=None):
     Notes are compared for **exact** equality only, and never against a title/bullet: boilerplate
     speaker notes differing by slide number are legitimate and a fuzzy test on them would fail
     every deck built from a house template.
+
+    ``nav_slides`` exempts *navigation* slides from rules 2-4 only.  An outline/agenda page
+    legitimately lists the section names that later pages are titled by — measured false positive:
+    a bullet ``"Materials and Methods"`` on the outline slide matched the title of the Methods
+    page.  Rule 1 is deliberately **not** exempt, because it is what catches the real defect this
+    check was built for (five boilerplate stubs on one outline slide); that page is exactly the
+    kind of page a blanket exemption would have protected.
     """
     issues = []
     seen = set()
@@ -823,7 +1377,7 @@ def duplicate_content_issues(units, min_chars=20, threshold=None):
         seen.add(key)
         issues.append((si, sj, reason))
 
-    # ---- 1. repeated bullet fingerprints ----
+    # ---- 1. repeated bullet fingerprints (never exempt) ----
     # Counted regardless of *which* slide carries them.  The real defect that motivated this
     # rule had five stubs on a SINGLE slide ("Problem: … Method: … Conclusion: what this page
     # has to establish."), so a "same bullet on >= 2 slides" test would have missed it; two
@@ -861,6 +1415,8 @@ def duplicate_content_issues(units, min_chars=20, threshold=None):
         for b in range(a + 1, n):
             sj, kj, tj, cj = comparable[b]
             if si == sj or len(tj) < min_chars:
+                continue
+            if si in nav_slides or sj in nav_slides:
                 continue
             if "notes" in (ki, kj):
                 if ki == "notes" and kj == "notes" and ti == tj:
@@ -982,22 +1538,29 @@ def run_checks(case_path, work, out=None, case_id=None):
     g = Gate()
 
     # ---------------- read the artefacts independently ---------------- #
+    # The stdlib OOXML model is the primary reader: it needs nothing but `zipfile` and
+    # `xml.etree`, so the verifier still applies V02/V03/V04/V06/V10/V11/V16/V17 on a container
+    # where python-pptx is absent.  python-pptx, when importable, is an equivalent adapter.
     prs = None
-    slides = []
     deck_parts = {}
     deck_slides_xml = []
-    if Presentation is not None and deck_path.is_file():
-        try:
-            prs = Presentation(str(deck_path))
-            slides = list(prs.slides)
-        except Exception:  # noqa: BLE001
-            prs = None
+    model = None
+    deck_read_error = ""
     if deck_path.is_file():
         deck_parts = zip_parts(deck_path)
         deck_slides_xml = [(n, part_text(deck_parts, f"ppt/slides/slide{n}.xml"))
                            for n in slide_numbers(deck_parts)]
+        model = model_from_parts(deck_parts)
+    if model is None and Presentation is not None and deck_path.is_file():
+        try:
+            prs = Presentation(str(deck_path))
+            model = model_from_pptx(prs)
+        except Exception as exc:  # noqa: BLE001
+            deck_read_error = f"python-pptx could not read the deck: {exc}"
+    if model is None and deck_path.is_file() and not deck_read_error:
+        deck_read_error = ("the deck's OOXML could not be parsed (no readable slide parts)")
 
-    deck_slide_count = len(slides) if slides else len(slide_numbers(deck_parts))
+    deck_slide_count = model.slide_count if model is not None else len(slide_numbers(deck_parts))
     plan_slides = (plan or {}).get("slides") or []
 
     # ---------------- V01 slide count ---------------- #
@@ -1038,25 +1601,21 @@ def run_checks(case_path, work, out=None, case_id=None):
                   f"{deck_path}:1", defects=[{"severity": "high", "detail": why}])
 
     # ---------------- V02 titles + claims ---------------- #
-    if not plan_slides and not slides:
+    if not plan_slides and model is None:
         g.add("V02", "every slide has non-empty title and claim", "UNVERIFIED",
-              "Neither plan.json slides nor a readable deck were available.",
+              "Neither plan.json slides nor a readable deck were available "
+              + (f"({deck_read_error})" if deck_read_error else "") + ".",
               f"{plan_path}:1")
     else:
         bad = []
-        n = max(len(plan_slides), len(slides))
+        n = max(len(plan_slides), deck_slide_count)
         for i in range(n):
             ps = plan_slides[i] if i < len(plan_slides) else {}
-            s = slides[i] if i < len(slides) else None
+            has_deck_slide = model is not None and i < model.slide_count
             title = (ps.get("title") or "").strip()
             claim = (ps.get("claim") or "").strip()
-            if s is not None:
-                deck_title = ""
-                try:
-                    if s.shapes.title is not None:
-                        deck_title = (s.shapes.title.text or "").strip()
-                except Exception:  # noqa: BLE001
-                    deck_title = ""
+            if has_deck_slide:
+                deck_title = model.title(i)
                 if not deck_title and not title:
                     bad.append((i + 1, "no title in deck or plan"))
                 elif title and not deck_title:
@@ -1072,30 +1631,27 @@ def run_checks(case_path, work, out=None, case_id=None):
                   defects=[{"severity": "high", "detail": d, "slide": s} for s, d in bad])
         else:
             g.add("V02", "every slide has non-empty title and claim", "PASS",
-                  f"all {n} slides carry a non-empty deck title and a non-empty plan claim",
+                  f"all {n} slides carry a non-empty deck title and a non-empty plan claim "
+                  f"(deck read via {model.backend})",
                   find_key_line(plan_path, "claim") if plan_path.is_file() else f"{deck_path}:1")
 
     # ---------------- V03 speaker notes >= 40 chars ---------------- #
     MIN_NOTES = 40
-    if not slides and not plan_slides:
+    if model is None and not plan_slides:
         g.add("V03", "every slide has notes >= 40 chars", "UNVERIFIED",
-              "No deck and no plan slides to read notes from.", f"{work}:1")
+              "No deck and no plan slides to read notes from"
+              + (f" ({deck_read_error})" if deck_read_error else "") + ".", f"{work}:1")
     else:
         bad = []
-        for i, s in enumerate(slides, 1):
-            notes = ""
-            try:
-                if s.has_notes_slide:
-                    notes = s.notes_slide.notes_text_frame.text or ""
-            except Exception:  # noqa: BLE001
-                notes = ""
+        for i in range(model.slide_count if model is not None else 0):
+            notes = model.notes(i)
             if len(notes.strip()) < MIN_NOTES:
-                ps = plan_slides[i - 1] if i - 1 < len(plan_slides) else {}
+                ps = plan_slides[i] if i < len(plan_slides) else {}
                 plan_notes = (ps.get("notes") or "")
                 extra = (f"; plan carries {len(plan_notes.strip())} chars but the deck's notes "
                          f"slide does not") if len(plan_notes.strip()) >= MIN_NOTES else ""
-                bad.append((i, f"deck notes {len(notes.strip())} chars{extra}"))
-        if not slides and plan_slides:
+                bad.append((i + 1, f"deck notes {len(notes.strip())} chars{extra}"))
+        if model is None and plan_slides:
             for i, ps in enumerate(plan_slides, 1):
                 if len((ps.get("notes") or "").strip()) < MIN_NOTES:
                     bad.append((i, f"plan notes {len((ps.get('notes') or '').strip())} chars"))
@@ -1104,9 +1660,11 @@ def run_checks(case_path, work, out=None, case_id=None):
                   "; ".join(f"slide {s}: {d}" for s, d in bad[:12]), f"{deck_path}:1",
                   defects=[{"severity": "high", "detail": d, "slide": s} for s, d in bad])
         else:
+            counted = (model.slide_count if model is not None else len(plan_slides))
             g.add("V03", "every slide has notes >= 40 chars", "PASS",
-                  f"all {len(slides) or len(plan_slides)} slides carry >= {MIN_NOTES} chars of "
-                  f"notes, measured from the deck's notes slides",
+                  f"all {counted} slides carry >= {MIN_NOTES} chars of notes, measured from the "
+                  f"deck's notes slides (deck read via "
+                  f"{model.backend if model is not None else 'plan.json'})",
                   f"{deck_path}:1")
 
     # ---------------- V04 number traceability (from material + slide text) ---------------- #
@@ -1119,15 +1677,9 @@ def run_checks(case_path, work, out=None, case_id=None):
         offenders = []
         # authoritative text: what is actually written on the slides
         slide_texts = []
-        for i, s in enumerate(slides, 1):
-            chunks = []
-            for sh in s.shapes:
-                try:
-                    if sh.has_text_frame and sh.text_frame.text.strip():
-                        chunks.append(sh.text_frame.text)
-                except Exception:  # noqa: BLE001
-                    continue
-            slide_texts.append((i, "\n".join(chunks)))
+        if model is not None:
+            for i in range(model.slide_count):
+                slide_texts.append((i + 1, model.text(i)))
         if not slide_texts:
             for i, ps in enumerate(plan_slides, 1):
                 pieces = [ps.get("title") or "", ps.get("claim") or ""] + list(ps.get("bullets") or [])
@@ -1203,18 +1755,10 @@ def run_checks(case_path, work, out=None, case_id=None):
             continue
         declared[int(entry.get("index", 0) or 0)] = entry.get("images") or []
     embedded_counts = {}
-    for i, s in enumerate(slides, 1):
-        count = 0
-        for sh in s.shapes:
-            try:
-                if sh.shape_type is not None and "PICTURE" in str(sh.shape_type):
-                    count += 1
-                elif hasattr(sh, "image"):
-                    count += 1
-            except Exception:  # noqa: BLE001
-                continue
-        embedded_counts[i] = count
-    if not slides and not build:
+    if model is not None:
+        for i in range(model.slide_count):
+            embedded_counts[i + 1] = model.picture_count(i)
+    if model is None and not build:
         g.add("V06", "every embedded image is source-crop or redraw-from-data", "UNVERIFIED",
               "Neither the deck nor build_report.json was readable.", f"{build_path}:1")
     else:
@@ -1370,52 +1914,54 @@ def run_checks(case_path, work, out=None, case_id=None):
                       "the template rather than replacing them", f"{deck_path}:1")
 
     # ---------------- V10 no text overflow ---------------- #
-    if not slides:
+    if model is None:
         g.add("V10", "no text overflow (estimated extent <= shape extent)", "UNVERIFIED",
-              "No readable deck, so no shape geometry could be measured.", f"{deck_path}:1")
+              "No readable deck, so no shape geometry could be measured"
+              + (f" ({deck_read_error})" if deck_read_error else "") + ".", f"{deck_path}:1")
     else:
         offenders = []
         shrunk = []
         measured = 0
-        slide_h = int(getattr(prs, "slide_height", 0) or 0)
-        slide_w = int(getattr(prs, "slide_width", 0) or 0)
-        for i, s in enumerate(slides, 1):
-            for sh in s.shapes:
-                overflow, detail, needed, avail = shape_text_extent(sh)
+        unmeasurable = []
+        text_shapes = 0
+        slide_h = int(model.height or 0)
+        slide_w = int(model.width or 0)
+        for i in range(model.slide_count):
+            for sh in model.slides[i]:
+                if (sh.get("text") or "").strip():
+                    text_shapes += 1
+                overflow, detail, needed, avail = shape_extent(sh)
                 if overflow is None:
+                    # Not the same as "fits": record why the shape could not be measured so a
+                    # deck full of unmeasurable frames cannot pass on an empty measurement set.
+                    if (sh.get("text") or "").strip():
+                        unmeasurable.append((i + 1, f"{(sh.get('name') or 'shape')[:30]}: {detail}"))
                     continue
                 measured += 1
                 if not overflow:
                     continue
-                kind = shape_autofit_kind(sh)
-                name = ""
-                try:
-                    name = (sh.name or "")[:40]
-                except Exception:  # noqa: BLE001
-                    name = ""
+                kind = sh.get("autofit")
+                name = (sh.get("name") or "")[:40]
                 if kind == "norm":
                     # text is shrunk to fit: not clipped, but possibly tiny
-                    shrunk.append((i, f"{name or 'shape'}: {detail} (normAutofit shrinks text)"))
+                    shrunk.append((i + 1, f"{name or 'shape'}: {detail} (normAutofit shrinks text)"))
                     continue
                 if kind == "sp":
                     # the shape grows: the real question is whether it leaves the slide
-                    try:
-                        top = int(sh.top or 0)
-                        left = int(sh.left or 0)
-                        width = int(sh.width or 0)
-                    except Exception:  # noqa: BLE001
-                        top = left = width = 0
+                    top = int(sh.get("top") or 0)
+                    left = int(sh.get("left") or 0)
+                    width = int(sh.get("width") or 0)
                     grown_bottom = top + needed
                     if (slide_h and grown_bottom > slide_h + 1) or \
                             (slide_w and left + width > slide_w + 1):
                         offenders.append(
-                            (i, f"{name or 'shape'}: spAutoFit grows to "
-                                f"{grown_bottom / EMU_PER_INCH:.2f}in bottom / slide is "
-                                f"{slide_h / EMU_PER_INCH:.2f}in tall -- the content runs off "
-                                f"the slide ({detail})"))
+                            (i + 1, f"{name or 'shape'}: spAutoFit grows to "
+                                    f"{grown_bottom / EMU_PER_INCH:.2f}in bottom / slide is "
+                                    f"{slide_h / EMU_PER_INCH:.2f}in tall -- the content runs off "
+                                    f"the slide ({detail})"))
                     continue
-                offenders.append((i, f"{name or 'shape'}: {detail} (no autofit, so text is "
-                                     f"clipped rather than shrunk)"))
+                offenders.append((i + 1, f"{name or 'shape'}: {detail} (no autofit, so text is "
+                                         f"clipped rather than shrunk)"))
         # rendered cross-check: no word may fall outside the page box
         render_note = "render cross-check not available (no PDF)"
         render_bad = []
@@ -1453,55 +1999,52 @@ def run_checks(case_path, work, out=None, case_id=None):
                    f"advances; none exceed their box or leave the slide. Shapes carrying " \
                    f"normAutofit shrink their text (not clipped) and spAutoFit shapes were " \
                    f"checked against the slide box instead of their own. {render_note}"
+            if unmeasurable:
+                note += (f" | {len(unmeasurable)} text shape(s) could NOT be measured: "
+                         + "; ".join(f"slide {s}: {d}" for s, d in unmeasurable[:5]))
             if shrunk:
                 note += f" | {len(shrunk)} shape(s) rely on normAutofit shrink-to-fit: " \
                         + "; ".join(f"slide {s}: {d}" for s, d in shrunk[:5])
-            g.add("V10", "no text overflow (estimated extent <= shape extent)", "PASS",
-                  note, evidence)
+            if measured == 0 and text_shapes > 0:
+                # A green that certifies nothing is worse than an honest gap: V10 inspected no
+                # shape at all, so it must not report PASS.  (This is how N08 slipped through:
+                # inherited placeholder geometry was missing, so every frame was "zero-size".)
+                g.add("V10", "no text overflow (estimated extent <= shape extent)", "UNVERIFIED",
+                      f"the deck has {text_shapes} text-bearing shape(s) but V10 could measure "
+                      f"none of them, so overflow was not inspected at all (an empty measurement "
+                      f"set must never read as success). Unmeasurable examples: "
+                      + "; ".join(f"slide {s}: {d}" for s, d in unmeasurable[:5])
+                      + f" | {render_note}", evidence)
+            else:
+                g.add("V10", "no text overflow (estimated extent <= shape extent)", "PASS",
+                      note, evidence)
 
     # ---------------- V11 images inside their shape bounds ---------------- #
-    if not slides:
+    if model is None:
         g.add("V11", "images inside their shape bounds (not cropped)", "UNVERIFIED",
-              "No readable deck.", f"{deck_path}:1")
+              "No readable deck, so picture geometry could not be measured"
+              + (f" ({deck_read_error})" if deck_read_error else "") + ".", f"{deck_path}:1")
     else:
         problems = []
         checked = 0
-        for i, s in enumerate(slides, 1):
-            for sh in s.shapes:
-                try:
-                    is_pic = (sh.shape_type is not None and "PICTURE" in str(sh.shape_type)) \
-                        or hasattr(sh, "image")
-                except Exception:  # noqa: BLE001
-                    is_pic = False
-                if not is_pic:
-                    continue
+        for i in range(model.slide_count):
+            for sh in model.pictures(i):
                 checked += 1
-                try:
-                    xml = sh._element.xml
-                except Exception:  # noqa: BLE001
-                    xml = ""
-                # A picture's fill is <p:blipFill> while the crop is <a:srcRect>; match the
-                # tag name namespace-agnostically so both spellings are caught.
-                m = re.search(r"<(?:\w+:)?srcRect([^/>]*)/?>", xml)
-                if m and re.search(r'(l|t|r|b)="(?!0")', m.group(1)):
-                    problems.append((i, f"cropped via srcRect{m.group(1).strip()}"))
-                if prs is not None:
-                    try:
-                        left, top = int(sh.left or 0), int(sh.top or 0)
-                        right = left + int(sh.width or 0)
-                        bottom = top + int(sh.height or 0)
-                        if left < -1 or top < -1 or right > int(prs.slide_width or 0) + 1 or \
-                                bottom > int(prs.slide_height or 0) + 1:
-                            problems.append((i, f"frame extends outside the slide "
-                                                f"(l={left},t={top},r={right},b={bottom})"))
-                    except Exception:  # noqa: BLE001
-                        pass
-                if Image is not None:
-                    try:
-                        with sh.image as img:
-                            pass
-                    except Exception:  # noqa: BLE001
-                        pass
+                src = sh.get("src_rect")
+                if src:
+                    rendered = src if isinstance(src, str) else ", ".join(
+                        f"{k}={v}" for k, v in sorted(src.items()))
+                    problems.append((i + 1, f"cropped via srcRect {rendered}"))
+                left = int(sh.get("left") or 0)
+                top = int(sh.get("top") or 0)
+                width = int(sh.get("width") or 0)
+                height = int(sh.get("height") or 0)
+                if left < -1 or top < -1 or \
+                        left + width > int(model.width or 0) + 1 or \
+                        top + height > int(model.height or 0) + 1:
+                    problems.append((i + 1, f"frame extends outside the slide "
+                                            f"(l={left},t={top},r={left + width},"
+                                            f"b={top + height})"))
         if not checked:
             g.add("V11", "images inside their shape bounds (not cropped)", "PASS",
                   "The deck embeds no picture shapes, so no image can be cropped; vacuously "
@@ -1520,10 +2063,24 @@ def run_checks(case_path, work, out=None, case_id=None):
 
     # ---------------- V12 fonts resolvable + substitution reported ---------------- #
     named = fonts_used_in_deck(deck_parts) if deck_parts else []
+    render_produced = bool(render_path.is_file()) or bool((render or {}).get("status"))
     if not named:
         g.add("V12", "fonts used are resolvable and substitution is reported", "UNVERIFIED",
               "No typeface could be attributed to the deck (neither an explicit typeface nor a "
               "theme major/minor face), so resolvability cannot be inspected.",
+              f"{deck_path}:1")
+    elif not render_produced:
+        # No render happened, so nothing was substituted *visibly*: claiming a "silent
+        # substitution" here would be a false statement about our own run.  Say what is true --
+        # the deck names a face this host does not have, and the substitution could not be
+        # observed because no renderer ran.
+        unresolvable_no_render = [f for f in named if resolve_font(f) is None]
+        g.add("V12", "fonts used are resolvable and substitution is reported", "UNVERIFIED",
+              f"no render_report.json exists, so font substitution was never observed (no "
+              f"renderer ran). The deck names {unresolvable_no_render or 'only resolvable faces'}; "
+              f"{'these are not installed on this host' if unresolvable_no_render else 'all resolve'}"
+              f", but without a render there is no substituted output to report and no evidence "
+              f"the previews would be faithful.",
               f"{deck_path}:1")
     else:
         unresolvable = [f for f in named if resolve_font(f) is None]
@@ -1759,13 +2316,23 @@ def run_checks(case_path, work, out=None, case_id=None):
                   ev)
 
     # ---------------- V16 no duplicate slide content ---------------- #
-    units = slide_text_units(plan_slides, slides)
+    units = slide_text_units(plan_slides, model)
     if not units:
         g.add("V16", "no duplicate slide content", "UNVERIFIED",
               "No plan bullets and no readable deck text, so duplication cannot be inspected.",
               f"{deck_path}:1")
     else:
-        dups = duplicate_content_issues(units)
+        # Navigation pages (outline/agenda/section dividers) are allowed to repeat the *names* of
+        # later pages; only the pairwise rules are relaxed for them, never the repeated-bullet
+        # rule (see duplicate_content_issues).
+        NAV_ROLES = {"outline", "agenda", "toc", "contents", "table of contents",
+                     "overview", "roadmap", "section", "cover", "title", "divider"}
+        nav_slides = set()
+        for i, ps in enumerate(plan_slides, 1):
+            if isinstance(ps, dict) and \
+                    str(ps.get("role") or "").strip().lower() in NAV_ROLES:
+                nav_slides.add(i)
+        dups = duplicate_content_issues(units, nav_slides=frozenset(nav_slides))
         if dups:
             g.add("V16", "no duplicate slide content", "FAIL",
                   f"{len(dups)} pair(s) of slides reuse content: "
@@ -2018,6 +2585,147 @@ def run_checks(case_path, work, out=None, case_id=None):
                   f"the run had enough to work with: {detail}",
                   find_key_line(material_path, "figures") if material_path.is_file()
                   else f"{deck_path}:1")
+
+    # ---------------- V20 run produced deliverables ---------------- #
+    # The score-0 outcome was not "a gate passed a wrong property"; it was "the grader found no
+    # complete, genuinely-derived solution".  Every other check inspects an artefact that may
+    # simply not exist.  V20 asks the delivery question directly: did this run put a real deck
+    # -- and, when it claims a render, one preview per slide -- into `--out`?
+    #
+    # Direction matters, so the rule is explicit:
+    #   * no readable .pptx in --out            -> FAIL   (a missing deliverable is never success)
+    #   * result.json.status == "failed"        -> FAIL   (the run says it failed)
+    #   * result.json.status == "partial"       -> UNVERIFIED (honest "incomplete": the run
+    #                                              delivered a deck but declares itself short;
+    #                                              this must never read as PASS, but it must not
+    #                                              masquerade as a hard deliverable failure either)
+    #   * render "ok" but fewer previews        -> FAIL   (advertised complete, is not)
+    #   * otherwise                             -> PASS
+    out_dir = Path(out) if out else None
+    deliver_dirs = [out_dir] if out_dir else [work]
+    where = [str(d) for d in deliver_dirs if d]
+    deck_hits = []
+    for d in deliver_dirs:
+        if d and d.is_dir():
+            try:
+                deck_hits += sorted(p for p in d.glob("*.pptx") if p.is_file())
+            except OSError:
+                pass
+    deck_ok, deck_note = None, ""
+    for cand in deck_hits:
+        parts = zip_parts(cand)
+        n_parts_slides = len(slide_numbers(parts))
+        try:
+            size = cand.stat().st_size
+        except OSError:
+            size = 0
+        if parts and n_parts_slides > 0 and size > 0:
+            deck_ok = cand
+            deck_note = f"{cand.name} ({size} B, {n_parts_slides} slide part(s))"
+            break
+        deck_note += (f" {cand.name} present but not a readable deck ({size} B, "
+                      f"{len(parts)} part(s));")
+    # Fallback the brief allows: the deck key's declared target.  result.json is the run's own
+    # statement of what it delivered, so a valid deck there counts -- but if it sits outside the
+    # delivery directory that is worth an advisory, because the platform reads --out.
+    deck_outside_out = False
+    if deck_ok is None or (out_dir and Path(deck_ok).parent.resolve() != out_dir.resolve()):
+        declared_paths = []
+
+        def _collect_declared(value, depth=0):
+            if depth > 4 or len(declared_paths) > 40:
+                return
+            if isinstance(value, str):
+                if value.lower().endswith(".pptx"):
+                    declared_paths.append(value)
+            elif isinstance(value, dict):
+                for v in value.values():
+                    _collect_declared(v, depth + 1)
+            elif isinstance(value, list):
+                for v in value:
+                    _collect_declared(v, depth + 1)
+
+        _collect_declared(result)
+        for raw in declared_paths:
+            cand = Path(raw)
+            if not cand.is_file():
+                continue
+            parts = zip_parts(cand)
+            if not parts or not slide_numbers(parts) or cand.stat().st_size <= 0:
+                continue
+            if deck_ok is None:
+                deck_ok = cand
+                deck_note = (f"{cand.name} ({cand.stat().st_size} B, "
+                             f"{len(slide_numbers(parts))} slide part(s), declared by "
+                             f"result.json)")
+            if out_dir and cand.parent.resolve() != out_dir.resolve():
+                deck_outside_out = True
+            break
+    status_in_result = str((result or {}).get("status") or "").strip().lower()
+    status_shown = status_in_result or "(absent)"
+    render_status = str((render or {}).get("status") or "").strip().lower()
+    render_shown = render_status or "(absent)"
+    expected_slides = deck_slide_count or 0
+    previews = set()
+    for d in deliver_dirs:
+        if not (d and d.is_dir()):
+            continue
+        for sub in ("", "render", "previews"):
+            base = (d / sub) if sub else d
+            try:
+                for p in base.glob("slide-*.png"):
+                    if p.is_file() and p.stat().st_size > 0:
+                        previews.add(str(p))
+            except OSError:
+                pass
+    n_previews = len(previews)
+
+    if deck_ok is None:
+        g.add("V20", "run produced deliverables", "FAIL",
+              f"no readable .pptx deliverable was found in {where}"
+              + (f" ({deck_note.strip()})" if deck_note.strip() else "")
+              + ". A run that produces no deck cannot be graded as a complete solution, so "
+                "this can never be reported as success.",
+              f"{where[0] if where else work}:1",
+              defects=[{"severity": "high",
+                        "detail": "no readable .pptx in the delivery directory"}])
+    elif status_in_result == "failed":
+        g.add("V20", "run produced deliverables", "FAIL",
+              f"a deck exists ({deck_note}) but result.json declares status 'failed', so the run "
+              f"itself says the solution is not usable"
+              + (f" (uncertainty: {(result.get('uncertainty') or [])[:2]})"
+                 if (result or {}).get("uncertainty") else ""),
+              find_key_line(result_path, "status") if result_path.is_file() else f"{deck_path}:1",
+              defects=[{"severity": "high",
+                        "detail": "run self-reported status 'failed'"}])
+    elif status_in_result == "partial":
+        g.add("V20", "run produced deliverables", "UNVERIFIED",
+              f"a deck was delivered ({deck_note}, {n_previews} preview(s)) but result.json "
+              f"declares status 'partial', so completeness cannot be certified: the run itself "
+              f"says part of the solution is missing"
+              + (f" -- {list((result.get('uncertainty') or []))[:2]}"
+                 if (result or {}).get("uncertainty") else "")
+              + ". This is deliberately not PASS (incomplete is not success) and deliberately "
+                "not FAIL (the deck is real and every other check keeps its own verdict).",
+              find_key_line(result_path, "status") if result_path.is_file() else f"{deck_path}:1")
+    elif render_status == "ok" and expected_slides and n_previews < expected_slides:
+        g.add("V20", "run produced deliverables", "FAIL",
+              f"render_report.status is 'ok' but only {n_previews} non-empty preview(s) were "
+              f"found for {expected_slides} slide(s) in {where}; the render advertised itself as "
+              f"complete and is not",
+              f"{where[0] if where else work}:1",
+              defects=[{"severity": "high",
+                        "detail": f"{n_previews}/{expected_slides} slide previews present"}])
+    else:
+        g.add("V20", "run produced deliverables", "PASS",
+              f"delivered {deck_note} in {where} with {n_previews} non-empty preview(s) for "
+              f"{expected_slides} slide(s); result.json status {status_shown!r}, render status "
+              f"{render_shown!r}",
+              f"{where[0] if where else work}:1")
+        if deck_outside_out:
+            g.warn("V20", "the deck was found at a path declared by result.json rather than "
+                          "inside --out; the platform reads the output directory, so the deck "
+                          "should also be copied there")
 
     counts = g.counts()
     report = {

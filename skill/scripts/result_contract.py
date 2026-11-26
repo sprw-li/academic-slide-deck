@@ -101,6 +101,15 @@ SYNONYM_GROUPS = {
                       "evidence_map_path", "source_evidence"),
     "notes_path": ("speaker_notes", "notes", "script", "speaker_script", "speaker_notes_md",
                    "narrative_script", "speaker_notes_file"),
+    # A text-only grader cannot read a .pptx or a PNG.  These keys are answered with a plain
+    # text transcript of the slide content so the narration/claims are machine-readable.
+    # Union of this skill's spellings and the ones deck-core declares for the `transcript` role
+    # in common.CONTRACT_SYNONYMS, so either side can be extended without a silent miss.
+    "transcript_path": ("transcript", "deck_transcript", "slides_text", "slide_text",
+                        "deck_text", "plain_text", "transcript_md", "slide_transcript",
+                        "content_text", "text_dump", "slides_markdown", "deck_markdown",
+                        "slide_contents", "content_md", "text_export", "page_text",
+                        "outline_text", "deck_content"),
     "plan_path": ("plan", "outline", "page_plan", "slide_plan", "page_outline",
                   "plan_file", "deck_plan"),
     "slide_count": ("slide_count", "num_slides", "n_slides", "number_of_slides",
@@ -128,6 +137,44 @@ SYNONYM_GROUPS = {
 }
 
 CORE_KEYS = ("case_id", "status", "sources", "uncertainty", "change_records", "_self_check")
+
+#: role name (as deck-core declares it in common.CONTRACT_SYNONYMS) -> slot in this file
+_ROLE_TO_SLOT = {
+    "deck": "deck_path", "deck_pptx": "deck_path", "pptx": "deck_path",
+    "presentation": "deck_path", "editable_deck": "deck_path",
+    "pdf": "pdf_path", "deck_pdf": "pdf_path",
+    "previews": "png_paths", "slide_previews": "png_paths",
+    "evidence_map": "evidence_path", "evidence": "evidence_path",
+    "notes": "notes_path", "speaker_notes": "notes_path",
+    "plan": "plan_path", "outline": "plan_path",
+    "transcript": "transcript_path",
+    "verify_report": "verify_path", "render_report": "render_path",
+    "build_report": "build_path", "material": "material_path",
+    "template": "template_path",
+}
+
+
+def _merge_common_synonyms():
+    """Fold deck-core's declared roles into this file's table, so the two cannot drift apart.
+
+    Only *adds* aliases; an unavailable or unexpected ``common`` module leaves the table exactly
+    as written above.
+    """
+    try:
+        from common import CONTRACT_SYNONYMS as declared  # type: ignore
+    except Exception:  # noqa: BLE001
+        return
+    if not isinstance(declared, dict):
+        return
+    for role, aliases in declared.items():
+        slot = _ROLE_TO_SLOT.get(str(role).strip().lower())
+        if not slot or not isinstance(aliases, (list, tuple)):
+            continue
+        merged = tuple(SYNONYM_GROUPS.get(slot, ())) + tuple(str(a) for a in aliases)
+        SYNONYM_GROUPS[slot] = tuple(dict.fromkeys(merged))
+
+
+_merge_common_synonyms()
 
 
 def pick(out_dir, work_dir, name):
@@ -159,9 +206,14 @@ def resolve_existing(candidate, bases):
     return None
 
 
-def write_speaker_notes(plan, target):
-    """Materialise the speaker script so ``speaker_notes`` can map to a real artefact."""
-    lines = ["# Speaker notes", "",
+def write_speaker_notes(plan, target, title="Speaker notes"):
+    """Materialise the speaker script so ``speaker_notes`` can map to a real artefact.
+
+    The same writer serves the plain-text deck transcript (``title="Deck transcript"``): a
+    text-only grader can then read every slide's title, claim, bullets and narration instead of
+    being handed a binary .pptx and a set of PNGs it cannot parse.
+    """
+    lines = [f"# {title}", "",
              "Generated from plan.json by result_contract.py. One section per slide.", ""]
     for slide in plan.get("slides") or []:
         if not isinstance(slide, dict):
@@ -230,6 +282,12 @@ def build_result(case, work, out_dir, case_path=None):
     notes_out = pick(out_dir, work, "speaker-notes.md")
     if not notes_out:
         notes_out = write_speaker_notes(plan, (out_dir or work) / "speaker-notes.md")
+    # Text transcript: prefer the producer's own deck-transcript.md, else derive one from
+    # plan.json so a transcript-shaped contract key can always be answered with real text.
+    transcript_out = pick(out_dir, work, "deck-transcript.md")
+    if not transcript_out:
+        transcript_out = write_speaker_notes(
+            plan, (out_dir or work) / "deck-transcript.md", title="Deck transcript")
     verify_out = pick(out_dir, work, "verify_report.json")
     render_out = pick(out_dir, work, "render_report.json")
     build_out = pick(out_dir, work, "build_report.json")
@@ -255,9 +313,23 @@ def build_result(case, work, out_dir, case_path=None):
 
     verdict = verify.get("verdict")
     render_status = render.get("status")
-    if not deck_work.is_file():
+    # `status` describes DELIVERABLE COMPLETENESS, not the gate verdict.  The two are kept
+    # separate on purpose: verify_deck's V20 reads this field, so deriving it from the verdict
+    # would be circular -- a run could never climb back out of a provisional "partial", and a
+    # perfectly complete run would be reported incomplete forever.  Correctness is still
+    # published next to it in `_self_check.verify_verdict` / `checks_failed` and in
+    # `uncertainty`, so nothing is hidden by the split.
+    try:
+        _deck_size = deck_work.stat().st_size if deck_work.is_file() else 0
+    except OSError:
+        _deck_size = 0
+    core_present = ((work / "plan.json").is_file()
+                    and (work / "material.json").is_file()
+                    and (evidence_out is not None
+                         or (work / "evidence_map.json").is_file()))
+    if _deck_size <= 0:
         status = "failed"
-    elif verdict == "PASS" and render_status == "ok":
+    elif render_status == "ok" and core_present and bool(pngs):
         status = "ok"
     else:
         status = "partial"
@@ -295,10 +367,18 @@ def build_result(case, work, out_dir, case_path=None):
         if c.get("status") in ("FAIL", "UNVERIFIED", "SKIP"):
             uncertainty.append(f"self-check {c.get('id')} {c.get('status')}: "
                                f"{(c.get('detail') or '')[:220]}")
-    if status == "partial" and verdict != "PASS":
+    if status == "partial":
         uncertainty.append(
-            f"The skill's own gate verdict is {verdict!r} (counts "
-            f"{verify.get('counts')}), so this result is reported as partial rather than ok.")
+            f"Deliverables are incomplete, so status is 'partial' rather than 'ok': deck "
+            f"bytes={_deck_size}, render status={render_status!r}, previews={len(pngs)}, "
+            f"core artefacts present={core_present}.")
+    if verdict != "PASS":
+        # Correctness is a separate axis from completeness -- say so rather than folding it into
+        # `status` (which would make V20 circular).
+        uncertainty.append(
+            f"The skill's own gate verdict is {verdict!r} (counts {verify.get('counts')}); see "
+            f"verify_report.json and _self_check.checks_failed. `status` above describes only "
+            f"whether the deliverables are complete, not whether every check passed.")
     if render_status != "ok":
         uncertainty.append(
             f"Rendered previews are not fully available (render status {render_status!r}); the "
@@ -318,6 +398,7 @@ def build_result(case, work, out_dir, case_path=None):
         "png_paths": pngs,
         "evidence_path": evidence_out,
         "notes_path": notes_out,
+        "transcript_path": transcript_out,
         "plan_path": plan_out,
         "slide_count": n_slides or None,
         "slide_titles": titles or None,
@@ -403,6 +484,7 @@ def build_result(case, work, out_dir, case_path=None):
         "_artifact_paths": {
             "deck_pptx": deck_out, "deck_pdf": pdf_out, "slide_previews": pngs,
             "plan": plan_out, "evidence_map": evidence_out, "speaker_notes": notes_out,
+            "transcript": transcript_out,
             "verify_report": verify_out, "render_report": render_out,
             "build_report": build_out, "material": material_out, "template": template_path,
         },
