@@ -20,7 +20,7 @@ scores the Skill itself on its own cases.
 | `dev-run-caseA/verify_report.json` | real gate report: V01–V20, zero FAIL, zero UNVERIFIED |
 | `dev-run-caseA/build_report.excerpt.json` | key fields of the real build report (template invariants, fonts, per-slide layout/overflow/notes) |
 | `dev-run-caseA/render_report.excerpt.json` | key fields of the real render report (renderer, PDF, per-slide preview geometry) |
-| `dev-run-caseA/run.log` | real stage/timing events of that run |
+| `dev-run-caseA/run-log.txt` | real stage/timing events of that run |
 
 ## Invocation
 
